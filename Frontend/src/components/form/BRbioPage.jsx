@@ -163,29 +163,29 @@ const BRbioPage = () => {
   
           {/* Table Headings */}
           <tr className="text-black text-xs sm:text-sm bg-gray-100">
-            <th className="border p-2">S No.</th>
-            <th className="border p-2 text-left">Description</th>
-            <th className="border p-2">Model No.</th>
-            <th className="border p-2">HSN</th>
-            <th className="border p-2">Qty</th>
-            <th className="border p-2">Unit Price</th>
-            <th className="border p-2">GST (%)</th>
-            <th className="border p-2">GST Amt</th>
-            <th className="border p-2">Total</th>
+            <th className="border border-gray-400 p-1 sm:p-2">S No.</th>
+            <th className="border border-gray-400 p-1 sm:p-2">Model No.</th>
+            <th className="border border-gray-400 p-1 sm:p-2 text-left">Description</th>
+            <th className="border border-gray-400 p-1 sm:p-2">HSN</th>
+            <th className="border border-gray-400 p-1 sm:p-2">Qty</th>
+            <th className="border border-gray-400 p-1 sm:p-2">Unit Price</th>
+            <th className="border border-gray-400 p-1 sm:p-2">GST (%)</th>
+            <th className="border border-gray-400 p-1 sm:p-2">GST Amt</th>
+            <th className="border border-gray-400 p-1 sm:p-2">Total</th>
           </tr>
   
           {/* Table Rows */}
           {formData.items.map((item, index) => (
             <tr key={index} className="text-center text-xs sm:text-sm">
-              <td className="border p-1">{index + 1}</td>
-              <td className="border p-2 text-left">{item.description}</td>
-              <td className="border p-2 text-left">{item.model}</td>
-              <td className="border p-1">{item.hsn}</td>
-              <td className="border p-1">{item.quantity}</td>
-              <td className="border p-1">₹{item.price}</td>
-              <td className="border p-1">{item.gst}%</td>
-              <td className="border p-1">₹{((item.quantity * item.price * item.gst) / 100).toFixed(2)}</td>
-              <td className="border p-1">₹{(item.quantity * item.price + (item.quantity * item.price * item.gst) / 100).toFixed(2)}</td>
+              <td className="border border-gray-400 p-1">{index + 1}</td>
+              <td className="border border-gray-400 p-1">{item.model}</td>
+              <td className="border border-gray-400 py-1 px-2 text-left">{item.description}</td>
+              <td className="border border-gray-400 p-1">{item.hsn}</td>
+              <td className="border border-gray-400 p-1">{item.quantity}</td>
+              <td className="border border-gray-400 p-1">₹{item.price}</td>
+              <td className="border border-gray-400 p-1">{item.gst}%</td>
+              <td className="border border-gray-400 p-1">₹{((item.quantity * item.price * item.gst) / 100).toFixed(2)}</td>
+              <td className="border border-gray-400 p-1">₹{(item.quantity * item.price + (item.quantity * item.price * item.gst) / 100).toFixed(2)}</td>
             </tr>
           ))}
   

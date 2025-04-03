@@ -181,8 +181,8 @@ const BRbioForm = () => {
           {fields.map((item, index) => (
             <div key={item.id} className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-4 mb-4 rounded-xl">
               <input value={index + 1} readOnly className="p-2 border rounded text-sm bg-gray-100" />
-              <input {...register(`items.${index}.description`)} placeholder="Description" className="p-2 border rounded text-sm col-span-2 lg:col-span-2" required />
               <input {...register(`items.${index}.model`)} placeholder="Model no." className="p-2 border rounded text-sm" required />
+              <input {...register(`items.${index}.description`)} placeholder="Description" className="p-2 border rounded text-sm col-span-2 lg:col-span-2" required />
               <input {...register(`items.${index}.hsn`)} placeholder="HSN" className="p-2 border rounded text-sm" />
               <input {...register(`items.${index}.quantity`)} type="number" placeholder="Qty" className="p-2 border rounded text-sm" required />
               <input {...register(`items.${index}.price`)} type="number" placeholder="Unit Price" className="p-2 border rounded text-sm" required />

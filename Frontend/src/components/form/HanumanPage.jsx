@@ -157,6 +157,7 @@ const HanumanPage = () => {
           </tr>
           <tr className="text-black text-xs md:text-sm">
             <th className="border border-gray-400 p-2">S No.</th>
+            <th className="border border-gray-400 p-2">Model No.</th>
             <th className="border border-gray-400 p-2 text-left">Description</th>
             <th className="border border-gray-400 p-2">HSN</th>
             <th className="border border-gray-400 p-2">Qty</th>
@@ -168,6 +169,7 @@ const HanumanPage = () => {
           {formData.items.map((item, index) => (
             <tr key={index} className="text-center text-xs">
               <td className="border border-gray-400 p-1">{index + 1}</td>
+              <td className="border border-gray-400 p-1">{item.model}</td>
               <td className="border border-gray-400 py-1 px-2 text-left">{item.description}</td>
               <td className="border border-gray-400 p-1">{item.hsn}</td>
               <td className="border border-gray-400 p-1">{item.quantity}</td>
