@@ -397,6 +397,44 @@ app.delete("/admin/users/:id", adminOnly, async (req, res) => {
   }
 });
 
+// ✅ STEP 1: Add this route to your backend (Node.js)
+app.get("/search-items", async (req, res) => {
+  const { query } = req.query;
+  if (!query) return res.status(400).json({ message: "Query required" });
+
+  try {
+    const invoices = await InvoiceModel.find({
+      "items.description": { $regex: query, $options: "i" },
+    });
+
+    const matchedItems = [];
+    invoices.forEach((invoice) => {
+      invoice.items.forEach((item) => {
+        if (item.description.toLowerCase().includes(query.toLowerCase())) {
+          matchedItems.push({
+            description: item.description,
+            model: item.model,
+            hsn: item.hsn,
+            gst: item.gst,
+            price: item.price,
+          });
+        }
+      });
+    });
+
+    // Remove duplicates by description
+    const uniqueItems = Array.from(
+      new Map(matchedItems.map((item) => [item.description, item])).values()
+    );
+
+    res.json(uniqueItems);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 const port = process.env.PORT;
 
 app.listen(port, () => {
