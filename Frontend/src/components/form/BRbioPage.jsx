@@ -165,6 +165,7 @@ const BRbioPage = () => {
           <tr className="text-black text-xs sm:text-sm bg-gray-100">
             <th className="border p-2">S No.</th>
             <th className="border p-2 text-left">Description</th>
+            <th className="border p-2">Model No.</th>
             <th className="border p-2">HSN</th>
             <th className="border p-2">Qty</th>
             <th className="border p-2">Unit Price</th>
@@ -178,6 +179,7 @@ const BRbioPage = () => {
             <tr key={index} className="text-center text-xs sm:text-sm">
               <td className="border p-1">{index + 1}</td>
               <td className="border p-2 text-left">{item.description}</td>
+              <td className="border p-2 text-left">{item.model}</td>
               <td className="border p-1">{item.hsn}</td>
               <td className="border p-1">{item.quantity}</td>
               <td className="border p-1">₹{item.price}</td>
