@@ -109,11 +109,11 @@ const VegoPage = () => {
   const rows = Array.from({ length: 4 });
 
   return (
-    <div className="w-full max-w-[210mm] min-h-screen sm:min-h-[297mm] p-4 sm:p-6 bg-white mx-auto overflow-auto" id="invoice">
+    <div className="w-full max-w-[210mm] min-h-screen sm:min-h-[297mm] bg-white mx-auto overflow-auto" id="invoice">
   <table className="w-full print:table border-collapse">
     <thead className="print:table-header-group">
       <tr>
-        <td colSpan={8} className="print:border-none">
+        <td colSpan={9} className="print:border-none">
           <div className="flex items-center justify-between mt-4 sm:mb-6">
             <img src={logovego} alt="Company Logo" className="w-full sm:max-w-[150px]" />
           </div>
@@ -123,14 +123,14 @@ const VegoPage = () => {
 
     <tbody className="print:table-row-group print:pb-4">
       <tr>
-        <td colSpan={8}>
+        <td colSpan={9}>
           <div>
             <h1 className="font-bold text-blue-500 uppercase text-lg sm:text-2xl mb-4 mt-4 sm:mt-8">quotation {formData.quotationNumber}</h1>
           </div>
         </td>
       </tr>
       <tr>
-        <td colSpan={8}>
+        <td colSpan={9}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
             <div>
               <h3 className="text-blue-500 px-2 py-1 font-semibold rounded">Company Details</h3>
@@ -182,7 +182,7 @@ const VegoPage = () => {
       ))}
 
       <tr>
-        <td colSpan={8}>
+        <td colSpan={9}>
           <div className="mb-6 text-xs sm:text-sm mt-6">
             <p><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
             <p><strong>Total GST:</strong> ₹{totalGST.toFixed(2)}</p>
@@ -193,7 +193,7 @@ const VegoPage = () => {
       </tr>
 
       <tr>
-        <td colSpan={8}>
+        <td colSpan={9}>
           <div className="mb-6">
             <h2 className="text-sm sm:text-base font-semibold mb-2">Terms & Conditions</h2>
             {formData.terms.split('\n').map((part, i) => (

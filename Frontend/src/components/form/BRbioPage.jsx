@@ -15,7 +15,8 @@ const BRbioPage = () => {
     return <p className="text-center text-red-500">No Quotation Data Available</p>;
   }
 
-  const subtotal = formData.items.reduce((acc, item) => acc + item.quantity * item.price, 0);
+  // const subtotal = formData.items.reduce((acc, item) => acc + item.quantity * item.price, 0);
+  const subtotal = formData.items.reduce((acc, item) => acc + (item.quantity || 0) * (item.price || 0), 0);
   const totalGST = formData.items.reduce((acc, item) => acc + (item.quantity * item.price * item.gst) / 100, 0);
   const grandTotal = subtotal + totalGST;
 
@@ -59,7 +60,7 @@ const BRbioPage = () => {
 
   const handleCleanPrint = () => {
     const content = document.getElementById("invoice").innerHTML;
-  
+
     const iframe = document.createElement("iframe");
     iframe.style.position = "fixed";
     iframe.style.right = "0";
@@ -67,9 +68,9 @@ const BRbioPage = () => {
     iframe.style.width = "0";
     iframe.style.height = "0";
     iframe.style.border = "0";
-  
+
     document.body.appendChild(iframe);
-  
+
     const doc = iframe.contentWindow.document;
     doc.open();
     doc.write(`
@@ -96,7 +97,7 @@ const BRbioPage = () => {
       </html>
     `);
     doc.close();
-  
+
     iframe.onload = () => {
       setTimeout(() => {
         iframe.contentWindow.focus();
@@ -105,34 +106,34 @@ const BRbioPage = () => {
       }, 500);
     };
   };
-  
+
 
   const rows = Array.from({ length: 4 });
 
   return (
-    <div className="w-full max-w-[210mm] min-h-screen md:min-h-[297mm] p-4 sm:p-6 bg-white mx-auto" id="invoice">
+    <div className="w-full max-w-[210mm] min-h-screen md:min-h-[297mm] bg-white mx-auto" id="invoice">
       <table className="w-full print:table border-collapse">
         <thead className="print:table-header-group">
           <tr>
-            <td colSpan={8} className="print:border-none">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
+            <td colSpan={9} className="print:border-none">
+              <div className="flex flex-col sm:flex-row items-center justify-between mt-4">
                 <img src={logobr} alt="Company Logo" className="w-full h-auto object-contain" />
               </div>
             </td>
           </tr>
         </thead>
-  
+
         <tbody className="print:table-row-group print:pb-4">
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <h1 className="text-lg md:text-2xl font-bold text-blue-500 uppercase my-4">
                 Quotation {formData.quotationNumber}
               </h1>
             </td>
           </tr>
-  
+
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                 {/* Company Details */}
                 <div>
@@ -145,7 +146,7 @@ const BRbioPage = () => {
                     <p><strong>GSTIN:</strong> {formData.companyGSTIN}</p>
                   </div>
                 </div>
-  
+
                 {/* Client Details */}
                 <div>
                   <h3 className="text-blue-500 font-semibold mb-1">Bill To</h3>
@@ -160,7 +161,7 @@ const BRbioPage = () => {
               </div>
             </td>
           </tr>
-  
+
           {/* Table Headings */}
           <tr className="text-black text-xs sm:text-sm bg-gray-100">
             <th className="border border-gray-400 p-1 sm:p-2">S No.</th>
@@ -173,7 +174,7 @@ const BRbioPage = () => {
             <th className="border border-gray-400 p-1 sm:p-2">GST Amt</th>
             <th className="border border-gray-400 p-1 sm:p-2">Total</th>
           </tr>
-  
+
           {/* Table Rows */}
           {formData.items.map((item, index) => (
             <tr key={index} className="text-center text-xs sm:text-sm">
@@ -188,10 +189,10 @@ const BRbioPage = () => {
               <td className="border border-gray-400 p-1">₹{(item.quantity * item.price + (item.quantity * item.price * item.gst) / 100).toFixed(2)}</td>
             </tr>
           ))}
-  
+
           {/* Totals */}
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <div className="my-6 text-sm sm:text-base space-y-1">
                 <p><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
                 <p><strong>Total GST:</strong> ₹{totalGST.toFixed(2)}</p>
@@ -202,10 +203,10 @@ const BRbioPage = () => {
               </div>
             </td>
           </tr>
-  
+
           {/* Terms */}
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <div className="mb-6">
                 <h2 className="text-base font-semibold mb-2">Terms & Conditions</h2>
                 {formData.terms.split('\n').map((line, i) => (
@@ -216,7 +217,7 @@ const BRbioPage = () => {
           </tr>
         </tbody>
       </table>
-  
+
       {/* Buttons */}
       <div className="flex flex-col sm:flex-row gap-3 mt-4 no-print">
         <button onClick={handleCleanPrint} className="bg-green-500 text-white px-4 py-2 rounded w-full sm:w-auto">

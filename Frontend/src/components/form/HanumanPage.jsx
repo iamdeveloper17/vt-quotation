@@ -59,7 +59,7 @@ const HanumanPage = () => {
 
   const handleCleanPrint = () => {
     const content = document.getElementById("invoice").innerHTML;
-  
+
     const iframe = document.createElement("iframe");
     iframe.style.position = "fixed";
     iframe.style.right = "0";
@@ -67,9 +67,9 @@ const HanumanPage = () => {
     iframe.style.width = "0";
     iframe.style.height = "0";
     iframe.style.border = "0";
-  
+
     document.body.appendChild(iframe);
-  
+
     const doc = iframe.contentWindow.document;
     doc.open();
     doc.write(`
@@ -96,7 +96,7 @@ const HanumanPage = () => {
       </html>
     `);
     doc.close();
-  
+
     iframe.onload = () => {
       setTimeout(() => {
         iframe.contentWindow.focus();
@@ -110,13 +110,13 @@ const HanumanPage = () => {
   const rows = Array.from({ length: 4 });
 
   return (
-    <div className="w-full max-w-[210mm] min-h-screen sm:min-h-[297mm] p-4 sm:p-6 bg-white mx-auto overflow-auto" id="invoice">
+    <div className="w-full max-w-[210mm] min-h-screen sm:min-h-[297mm] bg-white mx-auto overflow-auto" id="invoice">
 
       <table className="w-full print:table border-collapse">
         <thead className="print:table-header-group">
           <tr>
-            <td colSpan={8} className="print:border-none">
-              <div className="flex items-center justify-between -mb-0 mt-4 md:-mb-16">
+            <td colSpan={9} className="print:border-none">
+              <div className="flex items-center justify-between -mb-0 mt-4">
                 <img src={logohanuman} alt="Company Logo" className="w-full" />
               </div>
             </td>
@@ -125,28 +125,28 @@ const HanumanPage = () => {
 
         <tbody className="print:table-row-group">
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <div>
                 <p className="text-xs text-right md:text-sm"><strong>Date:</strong> {new Date(formData.date).toLocaleDateString("en-GB").replace(/\//g, "-")}</p>
               </div>
             </td>
           </tr>
           <tr>
-            <td colSpan={8}>
-                <div>
-                  <div className="text-xs text-zinc-700 md:text-sm">
-                    <p className="text-sm font-bold mb-1 md:text-base">Mr. {formData.clientName}</p>
-                    <p><span className="font-bold">Address :</span> {formData.clientAddress}</p>
-                    <p><span className="font-bold">Contact no. :</span> {formData.clientContact}</p>
-                    <p><span className="font-bold">Email :</span> {formData.clientEmail}</p>
-                    <p><span className="font-bold">GSTIN :</span> {formData.clientGSTIN}</p>
-                  </div>
+            <td colSpan={9}>
+              <div>
+                <div className="text-xs text-zinc-700 md:text-sm">
+                  <p className="text-sm font-bold mb-1 md:text-base">Mr. {formData.clientName}</p>
+                  <p><span className="font-bold">Address :</span> {formData.clientAddress}</p>
+                  <p><span className="font-bold">Contact no. :</span> {formData.clientContact}</p>
+                  <p><span className="font-bold">Email :</span> {formData.clientEmail}</p>
+                  <p><span className="font-bold">GSTIN :</span> {formData.clientGSTIN}</p>
                 </div>
+              </div>
               {/* </div> */}
             </td>
           </tr>
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <div className="mt-4">
                 <h1 className="uppercase font-bold text-center mb-2 text-blue-500 text-sm md:text-lg">Purchase Order no. {formData.purchaseNumber}</h1>
                 <p className="text-sm md:text-base">Dear <span className="font-bold">Mr. {formData.clientName}</span>,	</p>
@@ -180,7 +180,7 @@ const HanumanPage = () => {
             </tr>
           ))}
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <div className="mb-6 text-sm mt-6">
                 <p><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
                 <p><strong>Total GST:</strong> ₹{totalGST.toFixed(2)}</p>
@@ -190,28 +190,28 @@ const HanumanPage = () => {
             </td>
           </tr>
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <div className="mb-6">
                 <h2 className="text-sm md:text-base font-bold mb-2">Terms & Conditions</h2>
                 {formData.terms.split("\n").map((line, i) => {
-    const replacedLine = line
-      .replace(/{{orderAgainst}}/g, `<span class="underline font-bold">${formData.orderAgainst}</span>`)
-      .replace(/{{deliveryPeriod}}/g, `<span class="underline font-bold">${formData.deliveryPeriod}</span>`)
-      .replace(/{{placeInstallation}}/g, `<span class="underline font-bold">${formData.placeInstallation}</span>`);
+                  const replacedLine = line
+                    .replace(/{{orderAgainst}}/g, `<span class="underline font-bold">${formData.orderAgainst}</span>`)
+                    .replace(/{{deliveryPeriod}}/g, `<span class="underline font-bold">${formData.deliveryPeriod}</span>`)
+                    .replace(/{{placeInstallation}}/g, `<span class="underline font-bold">${formData.placeInstallation}</span>`);
 
-    return (
-      <p className="text-xs md:text-sm" key={i} dangerouslySetInnerHTML={{ __html: replacedLine }} />
-    );
-  })}
+                  return (
+                    <p className="text-xs md:text-sm" key={i} dangerouslySetInnerHTML={{ __html: replacedLine }} />
+                  );
+                })}
               </div>
               <div className="text-sm text-zinc-700">
-              <h3 className="text-blue-500 py-1 rounded text-base font-bold">Bill To</h3>
-                    <p className="text-sm font-bold md:text-base mb-1">{formData.companyName}</p>
-                    <p><span className="font-bold">Address :</span> {formData.companyAddress}</p>
-                    <p><span className="font-bold">Contact no. :</span> {formData.companyContact}</p>
-                    <p><span className="font-bold">Email :</span> {formData.companyEmail}</p>
-                    <p><span className="font-bold">GSTIN :</span> {formData.companyGSTIN}</p>
-                  </div>
+                <h3 className="text-blue-500 py-1 rounded text-base font-bold">Bill To</h3>
+                <p className="text-sm font-bold md:text-base mb-1">{formData.companyName}</p>
+                <p><span className="font-bold">Address :</span> {formData.companyAddress}</p>
+                <p><span className="font-bold">Contact no. :</span> {formData.companyContact}</p>
+                <p><span className="font-bold">Email :</span> {formData.companyEmail}</p>
+                <p><span className="font-bold">GSTIN :</span> {formData.companyGSTIN}</p>
+              </div>
               <div className="mt-10">
                 <p className="text-sm">Yours Sincerely,</p>
                 <p className="text-sm font-bold">For {formData.companyName}</p>

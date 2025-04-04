@@ -110,12 +110,12 @@ const HHCorpPage = () => {
   const rows = Array.from({ length: 4 });
 
   return (
-    <div className="w-full max-w-[210mm] min-h-screen sm:min-h-[297mm] p-4 sm:p-6 bg-white mx-auto overflow-auto" id="invoice">
+    <div className="w-full max-w-[210mm] min-h-screen sm:min-h-[297mm] bg-white mx-auto overflow-auto" id="invoice">
 
       <table className="w-full print:table border-collapse">
         <thead className="print:table-header-group">
           <tr>
-            <td colSpan={8} className="print:border-none">
+            <td colSpan={9} className="print:border-none">
               <div className="flex items-center justify-between -mb-8 mt-4 md:-mb-16">
                 <img src={logohh} alt="Company Logo" className="" />
               </div>
@@ -125,14 +125,14 @@ const HHCorpPage = () => {
 
         <tbody className="print:table-row-group">
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <div>
                 <p className="text-xs text-right md:text-sm"><strong>Date:</strong> {new Date(formData.date).toLocaleDateString("en-GB").replace(/\//g, "-")}</p>
               </div>
             </td>
           </tr>
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
                 <div>
                   <div className="text-xs text-zinc-700 md:text-sm">
                     <p className="text-sm font-bold mb-1 md:text-base">Mr. {formData.clientName}</p>
@@ -146,7 +146,7 @@ const HHCorpPage = () => {
             </td>
           </tr>
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <div className="mt-4">
                 <h1 className="uppercase font-bold text-center mb-2 text-blue-500 text-sm md:text-lg">Purchase Order no. {formData.purchaseNumber}</h1>
                 <p className="text-sm md:text-base">Dear <span className="font-bold">Mr. {formData.clientName}</span>,	</p>
@@ -180,7 +180,7 @@ const HHCorpPage = () => {
             </tr>
           ))}
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <div className="mb-6 text-sm mt-6">
                 <p><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
                 <p><strong>Total GST:</strong> ₹{totalGST.toFixed(2)}</p>
@@ -190,7 +190,7 @@ const HHCorpPage = () => {
             </td>
           </tr>
           <tr>
-            <td colSpan={8}>
+            <td colSpan={9}>
               <div className="mb-6">
                 <h2 className="text-sm md:text-base font-bold mb-2">Terms & Conditions</h2>
                 {formData.terms.split("\n").map((line, i) => {

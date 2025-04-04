@@ -125,13 +125,41 @@ const VegoForm = () => {
     });
   };
 
+
+      const [savedItems, setSavedItems] = useState([]);
+      const [suggestions, setSuggestions] = useState({});
+    
+      useEffect(() => {
+        const storedItems = JSON.parse(localStorage.getItem("savedItems")) || [];
+        setSavedItems(storedItems);
+      }, []);
+    
+      const handleDescriptionChange = (index, value) => {
+        if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
+    
+        const matches = savedItems.filter((item) =>
+          item.description.toLowerCase().includes(value.toLowerCase())
+        );
+    
+        setSuggestions((prev) => ({ ...prev, [index]: matches }));
+      };
+    
+      const handleSelectSuggestion = (index, item) => {
+        setValue(`items.${index}.description`, item.description);
+        setValue(`items.${index}.model`, item.model); // ✅ Add this line
+        setValue(`items.${index}.hsn`, item.hsn);
+        setValue(`items.${index}.price`, item.price);
+        setValue(`items.${index}.gst`, item.gst);
+        setSuggestions((prev) => ({ ...prev, [index]: [] }));
+      };
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center text-blue-500 uppercase">
         {editData ? "Edit Quotation" : "Create Quotation"}
       </h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
         {/* Company & Client Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -187,7 +215,29 @@ const VegoForm = () => {
             <div key={item.id} className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-4 mb-4 rounded-xl">
               <input value={index + 1} readOnly className="p-2 border rounded text-sm bg-gray-100" />
               <input {...register(`items.${index}.model`)} placeholder="Model no." className="p-2 border rounded text-sm" required />
-              <input {...register(`items.${index}.description`)} placeholder="Description" className="p-2 border rounded text-sm col-span-2 lg:col-span-2" required />
+              <div className="relative w-full col-span-2 lg:col-span-2">
+                <input
+                  {...register(`items.${index}.description`)}
+                  placeholder="Description"
+                  className="p-2 border rounded text-sm w-full"
+                  required
+                  onChange={(e) => handleDescriptionChange(index, e.target.value)}
+                />
+
+                {suggestions[index]?.length > 0 && (
+                  <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
+                    {suggestions[index].map((item, i) => (
+                      <li
+                        key={i}
+                        className="p-2 cursor-pointer hover:bg-gray-100"
+                        onClick={() => handleSelectSuggestion(index, item)}
+                      >
+                        {item.description} — {item.model}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
               <input {...register(`items.${index}.hsn`)} placeholder="HSN" className="p-2 border rounded text-sm" />
               <input {...register(`items.${index}.quantity`)} type="number" placeholder="Qty" className="p-2 border rounded text-sm" required />
               <input {...register(`items.${index}.price`)} type="number" placeholder="Unit Price" className="p-2 border rounded text-sm" required />

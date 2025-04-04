@@ -68,23 +68,42 @@ const BRbioForm = () => {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) return alert("User not logged in. Please log in again.");
 
-    const updatedItems = data.items.map((item) => {
-      const gstAmount = (item.quantity * item.price * item.gst) / 100;
-      const totalAmount = item.quantity * item.price + gstAmount;
+    // ✅ Clean empty items (optional, but good UX)
+    const nonEmptyItems = data.items.filter(item => item.description && item.quantity && item.price);
+
+    // ✅ Calculate gstAmount and totalAmount
+    const calculatedItems = nonEmptyItems.map((item) => {
+      const quantity = Number(item.quantity) || 0;
+      const price = Number(item.price) || 0;
+      const gst = Number(item.gst) || 0;
+
+      const gstAmount = (quantity * price * gst) / 100;
+      const totalAmount = quantity * price + gstAmount;
+
       return { ...item, gstAmount, totalAmount };
     });
 
-    const subTotal = updatedItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
-    const totalGST = updatedItems.reduce((acc, item) => acc + item.gstAmount, 0);
+    // ✅ Save unique suggestions for autocomplete
+    const newSuggestions = calculatedItems.map(({ description, hsn, price, gst, model }) => ({
+      description, hsn, price, gst, model
+    }));
+
+    const stored = JSON.parse(localStorage.getItem("savedItems")) || [];
+    const updatedSuggestions = [...new Map([...stored, ...newSuggestions].map(i => [i.description, i])).values()];
+    localStorage.setItem("savedItems", JSON.stringify(updatedSuggestions));
+
+    // ✅ Totals
+    const subTotal = calculatedItems.reduce((acc, item) => acc + (item.quantity * item.price), 0);
+    const totalGST = calculatedItems.reduce((acc, item) => acc + item.gstAmount, 0);
     const grandTotal = subTotal + totalGST;
 
-    const updatedData = {
+    const finalData = {
       ...data,
       userEmail,
-      items: updatedItems,
+      items: calculatedItems,
       subTotal,
       totalGST,
-      grandTotal
+      grandTotal,
     };
 
     try {
@@ -95,13 +114,13 @@ const BRbioForm = () => {
         {
           method: editData?._id ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedData),
+          body: JSON.stringify(finalData),
         }
       );
 
       if (response.ok) {
         alert(editData ? "Quotation updated!" : "Quotation saved!");
-        localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
+        localStorage.setItem("lastInvoice", JSON.stringify(finalData));
         navigate("/brbiopage");
       } else {
         alert("Something went wrong");
@@ -111,6 +130,7 @@ const BRbioForm = () => {
       alert("Error connecting to server");
     }
   };
+
 
   const addItem = () => {
     append({
@@ -125,6 +145,33 @@ const BRbioForm = () => {
     });
   };
 
+  const [savedItems, setSavedItems] = useState([]);
+  const [suggestions, setSuggestions] = useState({});
+
+  useEffect(() => {
+    const storedItems = JSON.parse(localStorage.getItem("savedItems")) || [];
+    setSavedItems(storedItems);
+  }, []);
+
+  const handleDescriptionChange = (index, value) => {
+    if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
+
+    const matches = savedItems.filter((item) =>
+      item.description.toLowerCase().includes(value.toLowerCase())
+    );
+
+    setSuggestions((prev) => ({ ...prev, [index]: matches }));
+  };
+
+  const handleSelectSuggestion = (index, item) => {
+    setValue(`items.${index}.description`, item.description);
+    setValue(`items.${index}.model`, item.model); // ✅ Add this line
+    setValue(`items.${index}.hsn`, item.hsn);
+    setValue(`items.${index}.price`, item.price);
+    setValue(`items.${index}.gst`, item.gst);
+    setSuggestions((prev) => ({ ...prev, [index]: [] }));
+  };
+
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
@@ -132,7 +179,7 @@ const BRbioForm = () => {
         {editData ? "Edit Quotation" : "Create Quotation"}
       </h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
         {/* Company & Client Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -177,12 +224,35 @@ const BRbioForm = () => {
         {/* Items */}
         <div>
           <h3 className="text-lg font-semibold mb-2">Items</h3>
-         
+
           {fields.map((item, index) => (
             <div key={item.id} className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-4 mb-4 rounded-xl">
               <input value={index + 1} readOnly className="p-2 border rounded text-sm bg-gray-100" />
               <input {...register(`items.${index}.model`)} placeholder="Model no." className="p-2 border rounded text-sm" required />
-              <input {...register(`items.${index}.description`)} placeholder="Description" className="p-2 border rounded text-sm col-span-2 lg:col-span-2" required />
+              <div className="relative w-full col-span-2 lg:col-span-2">
+                <input
+                  {...register(`items.${index}.description`)}
+                  placeholder="Description"
+                  className="p-2 border rounded text-sm w-full"
+                  required
+                  onChange={(e) => handleDescriptionChange(index, e.target.value)}
+                />
+
+                {suggestions[index]?.length > 0 && (
+                  <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
+                    {suggestions[index].map((item, i) => (
+                      <li
+                        key={i}
+                        className="p-2 cursor-pointer hover:bg-gray-100"
+                        onClick={() => handleSelectSuggestion(index, item)}
+                      >
+                        {item.description} — {item.model}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
               <input {...register(`items.${index}.hsn`)} placeholder="HSN" className="p-2 border rounded text-sm" />
               <input {...register(`items.${index}.quantity`)} type="number" placeholder="Qty" className="p-2 border rounded text-sm" required />
               <input {...register(`items.${index}.price`)} type="number" placeholder="Unit Price" className="p-2 border rounded text-sm" required />
@@ -196,7 +266,7 @@ const BRbioForm = () => {
               </button>
             </div>
           ))}
-           <button
+          <button
             type="button"
             onClick={addItem}
             className="bg-blue-600 text-white px-4 py-2 rounded text-sm mb-4 hover:bg-blue-700"
