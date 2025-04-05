@@ -77,17 +77,19 @@ const HHCorpPage = () => {
         <head>
           <title>Invoice</title>
           <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-          <style>
+         <style>
             @media print {
               .no-print {
                 display: none !important;
                 visibility: hidden !important;
               }
               @page {
-                margin: 0;
+                margin: 0 !important;
+                padding: 0 40px 35px 40px !important;
+                size: A4;
               }
               body {
-                margin: 1cm;
+                margin: 0 !important;
               }
             }
           </style>
@@ -110,14 +112,14 @@ const HHCorpPage = () => {
   const rows = Array.from({ length: 4 });
 
   return (
-    <div className="w-full max-w-[210mm] min-h-screen sm:min-h-[297mm] bg-white mx-auto overflow-auto" id="invoice">
+    <div className="w-full max-w-[210mm] min-h-screen sm:min-h-[297mm] bg-white mx-auto overflow-auto my-4" id="invoice">
 
       <table className="w-full print:table border-collapse">
         <thead className="print:table-header-group">
           <tr>
-            <td colSpan={9} className="print:border-none">
-              <div className="flex items-center justify-between -mb-8 mt-4 md:-mb-16">
-                <img src={logohh} alt="Company Logo" className="" />
+            <td colSpan={10} className="print:border-none">
+              <div className="flex items-center justify-between mb-4 mt-8">
+                <img src={logohh} alt="Company Logo" className="w-full" />
               </div>
             </td>
           </tr>
@@ -126,7 +128,7 @@ const HHCorpPage = () => {
         <tbody className="print:table-row-group">
           <tr>
             <td colSpan={9}>
-              <div>
+              <div className="mt-8">
                 <p className="text-xs text-right md:text-sm"><strong>Date:</strong> {new Date(formData.date).toLocaleDateString("en-GB").replace(/\//g, "-")}</p>
               </div>
             </td>
@@ -185,7 +187,7 @@ const HHCorpPage = () => {
                 <p><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
                 <p><strong>Total GST:</strong> ₹{totalGST.toFixed(2)}</p>
                 <p className="text-green-700 font-semibold text-base"><strong>Grand Total:</strong> ₹{grandTotal.toFixed(2)}</p>
-                <p className="text-gray-700 text-sm"><strong>In Words:</strong> {numberToIndianWords(grandTotal)}</p>
+                <p className="text-xs"><strong>In Words:</strong> {numberToIndianWords(grandTotal)}</p>
               </div>
             </td>
           </tr>
@@ -206,7 +208,7 @@ const HHCorpPage = () => {
               </div>
               <div className="text-sm text-zinc-700">
               <h3 className="text-blue-500 py-1 rounded text-base font-bold">Bill To</h3>
-                    <p className="text-sm font-bold md:text-base mb-1">{formData.companyName}</p>
+                    <p className="font-bold mb-1">{formData.companyName}</p>
                     <p><span className="font-bold">Address :</span> {formData.companyAddress}</p>
                     <p><span className="font-bold">Contact no. :</span> {formData.companyContact}</p>
                     <p><span className="font-bold">Email :</span> {formData.companyEmail}</p>

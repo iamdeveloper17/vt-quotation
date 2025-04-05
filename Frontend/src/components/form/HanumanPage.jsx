@@ -77,17 +77,19 @@ const HanumanPage = () => {
         <head>
           <title>Invoice</title>
           <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-          <style>
+                    <style>
             @media print {
               .no-print {
                 display: none !important;
                 visibility: hidden !important;
               }
               @page {
-                margin: 0;
+                margin: 0 !important;
+                padding: 0 40px 35px 40px !important;
+                size: A4;
               }
               body {
-                margin: 1cm;
+                margin: 0 !important;
               }
             }
           </style>
@@ -110,13 +112,13 @@ const HanumanPage = () => {
   const rows = Array.from({ length: 4 });
 
   return (
-    <div className="w-full max-w-[210mm] min-h-screen sm:min-h-[297mm] bg-white mx-auto overflow-auto" id="invoice">
+    <div className="w-full max-w-[210mm] min-h-screen sm:min-h-[297mm] bg-white mx-auto overflow-auto my-4" id="invoice">
 
       <table className="w-full print:table border-collapse">
         <thead className="print:table-header-group">
           <tr>
             <td colSpan={9} className="print:border-none">
-              <div className="flex items-center justify-between -mb-0 mt-4">
+              <div className="flex items-center justify-between mt-4">
                 <img src={logohanuman} alt="Company Logo" className="w-full" />
               </div>
             </td>
@@ -134,7 +136,7 @@ const HanumanPage = () => {
           <tr>
             <td colSpan={9}>
               <div>
-                <div className="text-xs text-zinc-700 md:text-sm">
+                <div className="text-xs md:text-sm">
                   <p className="text-sm font-bold mb-1 md:text-base">Mr. {formData.clientName}</p>
                   <p><span className="font-bold">Address :</span> {formData.clientAddress}</p>
                   <p><span className="font-bold">Contact no. :</span> {formData.clientContact}</p>
@@ -155,7 +157,7 @@ const HanumanPage = () => {
               </div>
             </td>
           </tr>
-          <tr className="text-black text-xs md:text-sm">
+          <tr className="text-xs md:text-sm">
             <th className="border border-gray-400 p-2">S No.</th>
             <th className="border border-gray-400 p-2">Model No.</th>
             <th className="border border-gray-400 p-2 text-left">Description</th>
@@ -185,7 +187,7 @@ const HanumanPage = () => {
                 <p><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
                 <p><strong>Total GST:</strong> ₹{totalGST.toFixed(2)}</p>
                 <p className="text-green-700 font-semibold text-base"><strong>Grand Total:</strong> ₹{grandTotal.toFixed(2)}</p>
-                <p className="text-gray-700 text-sm"><strong>In Words:</strong> {numberToIndianWords(grandTotal)}</p>
+                <p className="text-xs"><strong>In Words:</strong> {numberToIndianWords(grandTotal)}</p>
               </div>
             </td>
           </tr>
@@ -204,9 +206,9 @@ const HanumanPage = () => {
                   );
                 })}
               </div>
-              <div className="text-sm text-zinc-700">
+              <div className="text-sm">
                 <h3 className="text-blue-500 py-1 rounded text-base font-bold">Bill To</h3>
-                <p className="text-sm font-bold md:text-base mb-1">{formData.companyName}</p>
+                <p className="text-sm font-bold mb-1">{formData.companyName}</p>
                 <p><span className="font-bold">Address :</span> {formData.companyAddress}</p>
                 <p><span className="font-bold">Contact no. :</span> {formData.companyContact}</p>
                 <p><span className="font-bold">Email :</span> {formData.companyEmail}</p>

@@ -11,7 +11,7 @@ const HHCorpForm = () => {
     defaultValues: {
       companyName: "HH Corporation India",
       companyAddress: "D-71 SF, Malviya Nagar, New Delhi, 110017 ",
-      companyContact: "95992 90216",
+      companyContact: "9599290216",
       companyEmail: "accounts@hhcorp.in",
       companyGSTIN: "07BRFPA9155H1ZS",
       quotationNumber: "",
@@ -204,15 +204,15 @@ const HHCorpForm = () => {
           <div className="space-y-3">
             <input {...register("companyName")} placeholder="Company Name" required className="w-full p-2 border rounded text-sm" />
             <input {...register("companyAddress")} placeholder="Company Address" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("companyContact")} placeholder="Company Contact" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("companyEmail")} placeholder="Company Email" required className="w-full p-2 border rounded text-sm" />
+            <input type="number" {...register("companyContact")} placeholder="Company Contact" required className="w-full p-2 border rounded text-sm" />
+            <input type="email" {...register("companyEmail")} placeholder="Company Email" required className="w-full p-2 border rounded text-sm" />
             <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
           <div className="space-y-3">
             <input {...register("clientName")} placeholder="Sales Manager Name" required className="w-full p-2 border rounded text-sm" />
             <input {...register("clientAddress")} placeholder="Address" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientContact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientEmail")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
+            <input type="number" {...register("clientContact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
+            <input type="email" {...register("clientEmail")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
             <input {...register("clientGSTIN")} placeholder="GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>

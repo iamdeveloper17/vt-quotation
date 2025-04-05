@@ -336,13 +336,20 @@ const BRbioPage = () => {
         <head>
           <title>Invoice</title>
           <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-          <style>
+           <style>
             @media print {
-              .no-print { display: none !important; visibility: hidden !important; }
-              @page { margin: 0; }
-              body { margin: 1cm; }
-              table { table-layout: auto !important; width: 100%; }
-              th, td { word-break: break-word; vertical-align: top; }
+              .no-print {
+                display: none !important;
+                visibility: hidden !important;
+              }
+              @page {
+                margin: 0 !important;
+                padding: 0 40px 35px 40px !important;
+                size: A4;
+              }
+              body {
+                margin: 0 !important;
+              }
             }
           </style>
         </head>
@@ -361,13 +368,13 @@ const BRbioPage = () => {
   };
 
   return (
-    <div className="w-full max-w-[210mm] min-h-screen md:min-h-[297mm] bg-white mx-auto" id="invoice">
+    <div className="w-full max-w-[210mm] min-h-screen md:min-h-[297mm] bg-white mx-auto my-4" id="invoice">
       <table className="w-full table-auto border-collapse print:table">
         <thead className="print:table-header-group">
           <tr>
             <td colSpan={9} className="print:border-none">
-              <div className="flex flex-col sm:flex-row items-center justify-between mt-4">
-                <img src={logobr} alt="Company Logo" className="w-full h-auto object-contain" />
+              <div className="flex flex-col sm:flex-row items-center justify-between mt-8 mb-4 border-b-2 pb-4 border-black">
+                <img src={logobr} alt="Company Logo" className="w-full" />
               </div>
             </td>
           </tr>
@@ -376,20 +383,20 @@ const BRbioPage = () => {
         <tbody className="print:table-row-group print:pb-4">
           <tr>
             <td colSpan={9}>
-              <h1 className="text-lg md:text-2xl font-bold text-blue-500 uppercase my-4 text-center">
+              <h1 className="text-lg md:text-2xl font-bold text-blue-500 uppercase mt-8 mb-6 text-center">
                 Quotation {formData.quotationNumber}
               </h1>
-              <p className="text-sm"><span className="font-bold">Date:</span> {formData.date}</p>
-              <p className="text-sm"><span className="font-bold">Valid:</span> {formData.validUntil}</p>
+              <p className="text-xs text-right md:text-sm"><span className="font-bold">Date:</span> {formData.date}</p>
+              <p className="text-xs text-right md:text-sm"><span className="font-bold">Valid:</span> {formData.validUntil}</p>
             </td>
           </tr>
 
           <tr>
             <td colSpan={9}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 mt-12">
                 <div>
-                  <h3 className="text-blue-500 font-semibold mb-1">Company Details</h3>
-                  <div className="text-sm space-y-1">
+                  <h3 className="text-blue-500 font-bold mb-2 text-sm md:text-base">Company Details</h3>
+                  <div className="text-xs md:text-sm">
                     <p className="font-bold">{formData.companyName}</p>
                     <p><strong>Address:</strong> {formData.companyAddress}</p>
                     <p><strong>Contact:</strong> {formData.companyContact}</p>
@@ -398,8 +405,8 @@ const BRbioPage = () => {
                   </div>
                 </div>
                 <div className="items-end text-right">
-                  <h3 className="text-blue-500 font-semibold mb-1">Bill To</h3>
-                  <div className="text-sm space-y-1">
+                  <h3 className="text-blue-500 font-bold mb-2 text-sm md:text-base">Bill To</h3>
+                  <div className="text-xs md:text-sm">
                     <p className="font-bold">{formData.clientName}</p>
                     <p><strong>Address:</strong> {formData.clientAddress}</p>
                     <p><strong>Contact:</strong> {formData.clientContact}</p>
@@ -411,25 +418,25 @@ const BRbioPage = () => {
             </td>
           </tr>
 
-          <tr className="text-black text-xs sm:text-sm bg-gray-100">
-          <th className="border border-gray-400 p-1 min-w-[30px] text-xs">S No.</th>
-<th className="border border-gray-400 p-1 min-w-[80px] max-w-[100px] text-xs">Model No.</th>
-<th className="border border-gray-400 p-1 min-w-[180px] max-w-[250px] text-left text-xs break-words">Description</th>
-<th className="border border-gray-400 p-1 min-w-[70px] text-xs">HSN</th>
-<th className="border border-gray-400 p-1 min-w-[40px] text-xs">Qty</th>
-<th className="border border-gray-400 p-1 min-w-[80px] text-xs">Unit Price</th>
-<th className="border border-gray-400 p-1 min-w-[60px] text-xs">GST (%)</th>
-<th className="border border-gray-400 p-1 min-w-[80px] text-xs">GST Amt</th>
-<th className="border border-gray-400 p-1 min-w-[80px] text-xs">Total</th>
+          <tr className="text-xs md:text-sm bg-gray-100">
+            <th className="border border-gray-400 p-1 min-w-[50px]">S No.</th>
+            <th className="border border-gray-400 p-1 min-w-[80px] max-w-[100px]">Model No.</th>
+            <th className="border border-gray-400 px-2 py-1 min-w-[180px] max-w-[230px] text-left break-words">Description</th>
+            <th className="border border-gray-400 p-1 min-w-[70px]">HSN</th>
+            <th className="border border-gray-400 p-1 min-w-[40px]">Qty</th>
+            <th className="border border-gray-400 p-1 min-w-[80px]">Unit Price</th>
+            <th className="border border-gray-400 p-1 min-w-[60px]">GST (%)</th>
+            <th className="border border-gray-400 p-1 min-w-[80px]">GST Amt</th>
+            <th className="border border-gray-400 p-1 min-w-[80px]">Total</th>
 
           </tr>
 
           {formData.items.map((item, index) => (
-            <tr key={index} className="text-center text-xs sm:text-sm align-top">
+            <tr key={index} className="text-center text-xs md:text-sm align-top">
               <td className="border border-gray-400 p-1">{index + 1}</td>
               <td className="border border-gray-400 p-1">{item.model}</td>
               {/* <td className="border border-gray-400 p-1 text-left break-words whitespace-pre-wrap">{item.description}</td> */}
-              <td className="border border-gray-400 p-1 text-left break-words max-w-[250px]">{item.description}</td>
+              <td className="border border-gray-400 px-2 py-1 text-left break-words max-w-[230px]">{item.description}</td>
               <td className="border border-gray-400 p-1">{item.hsn}</td>
               <td className="border border-gray-400 p-1">{item.quantity}</td>
               <td className="border border-gray-400 p-1">₹{item.price}</td>
@@ -441,13 +448,13 @@ const BRbioPage = () => {
 
           <tr>
             <td colSpan={9}>
-              <div className="my-6 text-sm sm:text-base space-y-1">
+              <div className="my-6 text-sm space-y-1">
                 <p><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
                 <p><strong>Total GST:</strong> ₹{totalGST.toFixed(2)}</p>
                 <p className="text-green-700 font-semibold text-base">
                   <strong>Grand Total:</strong> ₹{grandTotal.toFixed(2)}
                 </p>
-                <p className="text-gray-700 text-sm"><strong>In Words:</strong> {numberToIndianWords(grandTotal)}</p>
+                <p className="text-xs md:text-sm"><strong>In Words:</strong> {numberToIndianWords(grandTotal)}</p>
               </div>
             </td>
           </tr>
@@ -455,9 +462,9 @@ const BRbioPage = () => {
           <tr>
             <td colSpan={9}>
               <div className="mb-6">
-                <h2 className="text-base font-semibold mb-2">Terms & Conditions</h2>
+                <h2 className="text-sm md:text-base font-bold mb-1">Terms & Conditions</h2>
                 {formData.terms.split('\n').map((line, i) => (
-                  <p key={i} className="text-sm text-gray-600 whitespace-pre-line">{line}</p>
+                  <p key={i} className="text-xs md:text-sm whitespace-pre-line">{line}</p>
                 ))}
               </div>
             </td>
