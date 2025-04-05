@@ -36,6 +36,17 @@
     display: none !important;
     visibility: hidden !important;
   }
+
+  table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  
+  td, th {
+    word-wrap: break-word;
+    vertical-align: top;
+  }
+  
 }
 
 

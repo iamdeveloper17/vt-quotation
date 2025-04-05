@@ -89,6 +89,12 @@ const HanumanForm = () => {
       const res = await fetch("https://vt-quotation.onrender.com/invoices/last-number");
       const data = await res.json();
       setValue("quotationNumber", data.quotationNumber + 1);
+      console.log("DATA TO BE SENT:", {
+        purchaseNumber: data.purchaseNumber,
+        orderAgainst: data.orderAgainst,
+        deliveryPeriod: data.deliveryPeriod,
+        placeInstallation: data.placeInstallation,
+      });
     } catch (error) {
       console.error("Error fetching quotation number:", error);
     }
@@ -116,6 +122,14 @@ const HanumanForm = () => {
       totalGST,
       grandTotal,
     };
+
+    console.log("Data sent to backend:", updatedData);
+
+    console.log("purchaseNumber:", data.purchaseNumber);
+console.log("orderAgainst:", data.orderAgainst);
+console.log("deliveryPeriod:", data.deliveryPeriod);
+console.log("placeInstallation:", data.placeInstallation);
+
 
     try {
       const response = await fetch(
@@ -164,6 +178,14 @@ const HanumanForm = () => {
     setSavedItems(storedItems);
   }, []);
 
+  useEffect(() => {
+    register("purchaseNumber");
+    register("orderAgainst");
+    register("deliveryPeriod");
+    register("placeInstallation");
+  }, [register]);
+  
+
   const handleDescriptionChange = (index, value) => {
     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
 
@@ -196,15 +218,15 @@ const HanumanForm = () => {
           <div className="space-y-3">
             <input {...register("companyName")} placeholder="Company Name" required className="w-full p-2 border rounded text-sm" />
             <input {...register("companyAddress")} placeholder="Company Address" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("companyContact")} placeholder="Company Contact" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("companyEmail")} placeholder="Company Email" required className="w-full p-2 border rounded text-sm" />
+            <input type="number" {...register("companyContact")} placeholder="Company Contact" required className="w-full p-2 border rounded text-sm" />
+            <input type="email" {...register("companyEmail")} placeholder="Company Email" required className="w-full p-2 border rounded text-sm" />
             <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
           <div className="space-y-3">
             <input {...register("clientName")} placeholder="Sales Manager Name" required className="w-full p-2 border rounded text-sm" />
             <input {...register("clientAddress")} placeholder="Address" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientContact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientEmail")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
+            <input type="number" {...register("clientContact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
+            <input type="email" {...register("clientEmail")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
             <input {...register("clientGSTIN")} placeholder="GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>

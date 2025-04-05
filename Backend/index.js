@@ -179,36 +179,6 @@ app.get("/invoices/last-number", async (req, res) => {
   }
 });
 
-// app.post("/invoices", async (req, res) => {
-//   try {
-//     // Instead of relying on the client-sent quotationNumber,
-//     // get the next number here.
-//     let counter = await Counter.findOne({ name: "quotationNumber" });
-//     let newQuotationNumber;
-//     if (!counter) {
-//       counter = new Counter({ name: "quotationNumber", value: 1 });
-//       newQuotationNumber = 1;
-//     } else {
-//       newQuotationNumber = counter.value + 1;
-//       counter.value = newQuotationNumber;
-//     }
-//     await counter.save();
-
-//     // Create new invoice with the newQuotationNumber:
-//     const newInvoice = new InvoiceModel({
-//       quotationNumber: newQuotationNumber,
-//       // ... the rest of your fields from req.body
-//       ...req.body,
-//     });
-
-//     await newInvoice.save();
-//     res.status(201).json({ message: "Quotation saved successfully", quotationNumber: newQuotationNumber });
-//   } catch (error) {
-//     console.error("Error saving quotation:", error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// });
-
 app.post("/invoices", async (req, res) => {
   try {
     const {
@@ -232,7 +202,19 @@ app.post("/invoices", async (req, res) => {
       terms,
       footerNote,
       userEmail,
+      // ✅ Add these 4:
+      purchaseNumber,
+      orderAgainst,
+      deliveryPeriod,
+      placeInstallation
     } = req.body;
+
+    console.log("Received in backend:", {
+      purchaseNumber,
+      orderAgainst,
+      deliveryPeriod,
+      placeInstallation,
+    });
 
     if (!userEmail) {
       return res.status(400).json({ message: "User email is required" });
@@ -272,6 +254,11 @@ app.post("/invoices", async (req, res) => {
           terms,
           footerNote,
           userEmail,
+          // ✅ Add these too:
+          purchaseNumber,
+          orderAgainst,
+          deliveryPeriod,
+          placeInstallation,
         },
         { new: true }
       );
@@ -301,6 +288,11 @@ app.post("/invoices", async (req, res) => {
       terms,
       footerNote,
       userEmail,
+      // ✅ Add them here too:
+      purchaseNumber,
+      orderAgainst,
+      deliveryPeriod,
+      placeInstallation,
     });
 
     await newInvoice.save();
@@ -354,6 +346,14 @@ app.delete("/invoices/:id", async (req, res) => {
   }
 });
 
+// app.put("/invoices/:id", async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const updatedInvoice = await InvoiceModel.findByIdAndUpdate(id, {
+//       ...req.body, // include all new fields from frontend
+//     }, { new: true });
+
 app.put("/invoices/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -369,6 +369,7 @@ app.put("/invoices/:id", async (req, res) => {
     res.status(500).json({ message: "Error updating invoice" });
   }
 });
+
 
 
 app.get("/admin/users", adminOnly, async (req, res) => {
