@@ -163,6 +163,13 @@ const HHCorpForm = () => {
       const storedItems = JSON.parse(localStorage.getItem("savedItems")) || [];
       setSavedItems(storedItems);
     }, []);
+
+    useEffect(() => {
+      register("purchaseNumber");
+      register("orderAgainst");
+      register("deliveryPeriod");
+      register("placeInstallation");
+    }, [register]);    
   
     const handleDescriptionChange = (index, value) => {
       if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
