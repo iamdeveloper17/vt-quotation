@@ -118,7 +118,7 @@ const BRbioPurchasePage = () => {
         <thead className="print:table-header-group">
           <tr>
             <td colSpan={9} className="print:border-none">
-              <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center justify-between mt-4 mb-8 border-b-2 pb-4">
                 <img src={logobr} alt="Company Logo" className="w-full" />
               </div>
             </td>

@@ -9,10 +9,10 @@ const { OAuth2Client } = require("google-auth-library");
 require("dotenv").config();
 const { InvoiceModel, Counter } = require("./models/Invoice");
 const adminOnly = require("./middleware/adminOnly");
+const PurchaseOrderModel = require("./models/PurchaseOrder");
 
 // const JWT_SECRET = "your_secret_key"; // Replace with a strong secret key
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
-
 
 const { createCanvas } = require("canvas");
 const path = require("path");
@@ -398,43 +398,6 @@ app.delete("/admin/users/:id", adminOnly, async (req, res) => {
   }
 });
 
-// ✅ STEP 1: Add this route to your backend (Node.js)
-// app.get("/search-items", async (req, res) => {
-//   const { query } = req.query;
-//   if (!query) return res.status(400).json({ message: "Query required" });
-
-//   try {
-//     const invoices = await InvoiceModel.find({
-//       "items.description": { $regex: query, $options: "i" },
-//     });
-
-//     const matchedItems = [];
-//     invoices.forEach((invoice) => {
-//       invoice.items.forEach((item) => {
-//         if (item.description.toLowerCase().includes(query.toLowerCase())) {
-//           matchedItems.push({
-//             description: item.description,
-//             model: item.model,
-//             hsn: item.hsn,
-//             gst: item.gst,
-//             price: item.price,
-//           });
-//         }
-//       });
-//     });
-
-//     // Remove duplicates by description
-//     const uniqueItems = Array.from(
-//       new Map(matchedItems.map((item) => [item.description, item])).values()
-//     );
-
-//     res.json(uniqueItems);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });
-
 app.get("/items/search", async (req, res) => {
   const { query } = req.query;
   try {
@@ -444,6 +407,64 @@ app.get("/items/search", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
+// CREATE Purchase Order
+app.post("/purchase-orders", async (req, res) => {
+  try {
+    const newOrder = new PurchaseOrderModel(req.body);
+    await newOrder.save();
+    res.status(201).json({ message: "Purchase order saved successfully", id: newOrder._id });
+  } catch (error) {
+    console.error("Error saving purchase order:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// GET All Purchase Orders
+app.get("/purchase-orders", async (req, res) => {
+  try {
+    const userEmail = req.query.userEmail;
+    const filter = userEmail ? { userEmail } : {};
+    const orders = await PurchaseOrderModel.find(filter);
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// GET Single Purchase Order by ID
+app.get("/purchase-orders/:id", async (req, res) => {
+  try {
+    const order = await PurchaseOrderModel.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: "Not found" });
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// UPDATE Purchase Order
+app.put("/purchase-orders/:id", async (req, res) => {
+  try {
+    const updated = await PurchaseOrderModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ message: "Not found" });
+    res.json({ message: "Purchase order updated", updated });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// DELETE Purchase Order
+app.delete("/purchase-orders/:id", async (req, res) => {
+  try {
+    await PurchaseOrderModel.findByIdAndDelete(req.params.id);
+    res.json({ message: "Purchase order deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 
 
