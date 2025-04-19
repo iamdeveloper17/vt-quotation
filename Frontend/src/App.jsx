@@ -19,6 +19,15 @@ import Unauthorized from './components/side_link/Unauthorized';
 import AdminUsers from './components/side_link/AdminUsers';
 import Quotation from './components/side_link/Quotation';
 import Login from './components/login/Login';
+import PurchaseOrder from './components/side_link/PurchaseOrder';
+import HanumanPurchaseForm from './components/purchase-form/HanumanPurchaseForm'
+import HanumanPurchasePage from './components/purchase-form/HanumanPurchasePage';
+import HHCorpPurchaseForm from './components/purchase-form/HHCorpPurchaseForm';
+import HHCorpPurchasePage from './components/purchase-form/HHCorpPurchasePage';
+import BRbioPurchaseForm from './components/purchase-form/BRbioPurchaseForm';
+import BRbioPurchasePage from './components/purchase-form/BRbioPurchasePage';
+import VegoPurchaseForm from './components/purchase-form/VegoPurchaseForm';
+import VegoPurchasePage from './components/purchase-form/VegoPurchasePage';
 
 const App = () => {
   return (
@@ -32,6 +41,7 @@ const App = () => {
             <Route path="dashboard" element={<PrivateRoute><DashBoard /></PrivateRoute>} />
             <Route path='quotation' element={<PrivateRoute><Quotation /></PrivateRoute>} />
             <Route path="adminusers" element={<PrivateRoute><AdminUsers /></PrivateRoute>} />
+            <Route path="purchase_order" element={<PrivateRoute><PurchaseOrder /></PrivateRoute>} />
           </Route>
           <Route path='/quotation/br' element={<PrivateRoute><BRbioForm /></PrivateRoute>} />
           <Route path='/brbiopage' element={<PrivateRoute><BRbioPage /></PrivateRoute>} />
@@ -41,6 +51,15 @@ const App = () => {
           <Route path='/vegopage' element={<PrivateRoute><VegoPage /></PrivateRoute>} />
           <Route path='/quotation/hh' element={<PrivateRoute><HHCorpForm /></PrivateRoute>} />
           <Route path='/hhpage' element={<PrivateRoute><HHCorpPage /></PrivateRoute>} />
+          
+          <Route path='/purchase_order/br' element={<PrivateRoute><BRbioPurchaseForm /></PrivateRoute>} />
+          <Route path='/brpurchasebiopage' element={<PrivateRoute><BRbioPurchasePage /></PrivateRoute>} />
+          <Route path='/purchase_order/hanuman' element={<PrivateRoute><HanumanPurchaseForm /></PrivateRoute>} />
+          <Route path='/hanumanpurchasepage' element={<PrivateRoute><HanumanPurchasePage /></PrivateRoute>} />
+          <Route path='/purchase_order/vego' element={<PrivateRoute><VegoPurchaseForm /></PrivateRoute>} />
+          <Route path='/vegopurchasepage' element={<PrivateRoute><VegoPurchasePage /></PrivateRoute>} />
+          <Route path='/purchase_order/hh' element={<PrivateRoute><HHCorpPurchaseForm /></PrivateRoute>} />
+          <Route path='/hhpurchasepage' element={<PrivateRoute><HHCorpPurchasePage /></PrivateRoute>} />
           <Route path='*' element={<Error />} />
           <Route path="/unauthorized" element={<PrivateRoute><Unauthorized /></PrivateRoute>} />
         </Routes>

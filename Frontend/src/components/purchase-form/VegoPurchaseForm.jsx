@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const VegoForm = () => {
+const VegoPurchaseForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const editData = location.state?.editData;
 
   const { register, control, handleSubmit, setValue, watch, reset } = useForm({
     defaultValues: {
-      companyName: "Vego & Thomson Pvt Ltd",
-      companyAddress: "D-71, MALVIYA NAGAR, NEW DLEHI, South Delhi, Delhi, 110017",
-      companyContact: "18002124669",
-      companyEmail: "contact@vegothomsonindia.com",
-      companyGSTIN: "07AAHCV1780G1Z7",
+        companyName: "Vego & Thomson Pvt Ltd",
+        companyAddress: "D-71, MALVIYA NAGAR, NEW DLEHI, South Delhi, Delhi, 110017",
+        companyContact: "18002124669",
+        companyEmail: "contact@vegothomsonindia.com",
+        companyGSTIN: "07AAHCV1780G1Z7",
       quotationNumber: "",
       date: "",
       validUntil: "",
@@ -36,6 +36,10 @@ const VegoForm = () => {
         },
       ],
       terms: "",
+      purchaseNumber: "",
+      orderAgainst: "",
+      deliveryPeriod: "",
+      placeInstallation: ""
     },
   });
 
@@ -48,7 +52,33 @@ const VegoForm = () => {
       setValue("date", new Date().toISOString().split("T")[0]);
       setValue(
         "terms",
-        "Best Terms and Conditions of a company serve as a legal agreement between the business and its customers, clients, or users..."
+        `1. Description: We are pleased to give you the work/Purchase Order against {{orderAgainst}}
+
+2. Payment Terms: 50% as in advance and the final 50% at the time of handover
+
+3. Warranty: 3 standard Year + 2 Years Extra Extended Warranty.
+
+4. Replacement: Replacement of defective goods must be changed without any charges. Our Technical team shall inspect the product upon delivery & installation, if found defective/not compliant/used the same shall be replaced without any additional costs. For defective/inferior supply we shall have legal remedy for recovery as well. In case of supply of second-hand goods / used items, the penalty of @200% cost of goods shall be implemented.
+
+5. Training: Training and Site repair must be done without any charges if required.
+
+6. Late supply Clause: If the Delivery of the order is getting delayed it will be charged 2.5% per week as a Late Delivery (LD) Terms
+
+7. Banking Details of Supplier: Proforma Invoice should be with Signature and stamp and Bank details will be there to prevent any mistake
+
+8. Delivery Period: On {{deliveryPeriod}}
+
+9. Place of Delivery: On Actual Site
+
+10. Place of Installation: {{placeInstallation}}
+
+11. Jurisdiction: In case of any dispute all jurisdiction will be in Delhi court.
+
+12. Paper Required: Company GST & PAN Card, Aadhaar Card, KYC Documents (Sign & Stamp)
+
+13. Scope of Work: All charges for local requirement at the time of Installation included in price
+
+14. Invoicing Instructions: The invoice should be prepared as follows:`
       );
       fetchQuotationNumber();
     }
@@ -59,6 +89,12 @@ const VegoForm = () => {
       const res = await fetch("https://vt-quotation.onrender.com/invoices/last-number");
       const data = await res.json();
       setValue("quotationNumber", data.quotationNumber + 1);
+      console.log("DATA TO BE SENT:", {
+        purchaseNumber: data.purchaseNumber,
+        orderAgainst: data.orderAgainst,
+        deliveryPeriod: data.deliveryPeriod,
+        placeInstallation: data.placeInstallation,
+      });
     } catch (error) {
       console.error("Error fetching quotation number:", error);
     }
@@ -87,6 +123,14 @@ const VegoForm = () => {
       grandTotal,
     };
 
+    console.log("Data sent to backend:", updatedData);
+
+    console.log("purchaseNumber:", data.purchaseNumber);
+    console.log("orderAgainst:", data.orderAgainst);
+    console.log("deliveryPeriod:", data.deliveryPeriod);
+    console.log("placeInstallation:", data.placeInstallation);
+
+
     try {
       const response = await fetch(
         editData?._id
@@ -102,7 +146,7 @@ const VegoForm = () => {
       if (response.ok) {
         alert(editData ? "Quotation updated!" : "Quotation saved!");
         localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
-        navigate("/vegopage");
+        navigate("/vegopurchasepage");
       } else {
         alert("Something went wrong");
       }
@@ -134,6 +178,14 @@ const VegoForm = () => {
     setSavedItems(storedItems);
   }, []);
 
+  useEffect(() => {
+    register("purchaseNumber");
+    register("orderAgainst");
+    register("deliveryPeriod");
+    register("placeInstallation");
+  }, [register]);
+
+
   const handleDescriptionChange = (index, value) => {
     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
 
@@ -156,7 +208,7 @@ const VegoForm = () => {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center text-blue-500 uppercase">
-        {editData ? "Edit Quotation" : "Create Quotation"}
+        {editData ? "Edit PO" : "Create PO"}
       </h2>
 
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -171,46 +223,45 @@ const VegoForm = () => {
             <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
           <div className="space-y-3">
-            <input {...register("clientName")} placeholder="Client Name" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientAddress")} placeholder="Client Address" required className="w-full p-2 border rounded text-sm" />
-            <input type="number" {...register("clientContact")} placeholder="Client Contact" required className="w-full p-2 border rounded text-sm" />
-            <input type="email" {...register("clientEmail")} placeholder="Client Email" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientGSTIN")} placeholder="Client GSTIN" required className="w-full p-2 border rounded text-sm" />
+            <input {...register("clientName")} placeholder="Sales Manager Name" required className="w-full p-2 border rounded text-sm" />
+            <input {...register("clientAddress")} placeholder="Address" required className="w-full p-2 border rounded text-sm" />
+            <input type="number" {...register("clientContact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
+            <input type="email" {...register("clientEmail")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
+            <input {...register("clientGSTIN")} placeholder="GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>
 
         {/* Date & Quotation */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block font-semibold text-sm mb-1">Date</label>
             <input {...register("date")} type="date" required className="w-full p-2 border rounded text-sm" />
           </div>
           <div>
-            <label className="block font-semibold text-sm mb-1">Valid Until</label>
-            <input {...register("validUntil")} type="date" required className="w-full p-2 border rounded text-sm" />
+            <label className="block font-semibold text-sm mb-1">Purchase Order No.</label>
+            <input {...register("purchaseNumber")} type="number" required className="w-full p-2 border rounded text-sm" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label className="block font-semibold text-sm mb-1">Purchase Order Against</label>
+            <input {...register("orderAgainst")} type="text" required className="w-full p-2 border rounded text-sm" />
           </div>
           <div>
-            <label className="block font-semibold text-sm mb-1">Quotation Number</label>
-            <input
-              {...register("quotationNumber")}
-              type="text"
-              value={watch("quotationNumber") || "Loading..."}
-              readOnly
-              className="w-full p-2 border rounded text-sm"
-            />
+            <label className="block font-semibold text-sm mb-1">Delivery Period On</label>
+            <input {...register("deliveryPeriod")} type="text" required className="w-full p-2 border rounded text-sm" />
+          </div>
+          <div>
+            <label className="block font-semibold text-sm mb-1">Place of Installation</label>
+            <input {...register("placeInstallation")} type="text" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>
 
         {/* Items */}
         <div>
           <h3 className="text-lg font-semibold mb-2">Items</h3>
-          <button
-            type="button"
-            onClick={addItem}
-            className="bg-blue-600 text-white px-4 py-2 rounded text-sm mb-4 hover:bg-blue-700"
-          >
-            Add Item
-          </button>
+
           {fields.map((item, index) => (
             <div key={item.id} className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-4 mb-4 rounded-xl">
               <input value={index + 1} readOnly className="p-2 border rounded text-sm bg-gray-100" />
@@ -251,11 +302,19 @@ const VegoForm = () => {
               </button>
             </div>
           ))}
+          <button
+            type="button"
+            onClick={addItem}
+            className="bg-blue-600 text-white px-4 py-2 rounded text-sm mb-4 hover:bg-blue-700"
+          >
+            Add Item
+          </button>
         </div>
 
         {/* Terms */}
         <div>
           <label className="block font-semibold text-sm mb-1">Term & Conditions</label>
+
           <textarea
             {...register("terms")}
             rows={4}
@@ -265,14 +324,14 @@ const VegoForm = () => {
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-wrap gap-4 mt-6">
+        <div className="flex flex-wrap gap-4 mt-6 print:hidden">
           <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-            {editData ? "View Quotation" : "Submit Quotation"}
+            {editData ? "View PO" : "Submit PO"}
           </button>
           <button type="button" onClick={() => navigate(-1)} className="bg-zinc-400 text-white px-6 py-2 rounded hover:bg-zinc-500">
             Back
           </button>
-          <button type="button" onClick={() => navigate("/home/quotation")} className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">
+          <button type="button" onClick={() => navigate("/home/purchase_order")} className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">
             Close
           </button>
         </div>
@@ -281,4 +340,4 @@ const VegoForm = () => {
   );
 };
 
-export default VegoForm;
+export default VegoPurchaseForm;

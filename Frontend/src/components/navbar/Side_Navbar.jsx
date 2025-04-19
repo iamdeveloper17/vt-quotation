@@ -55,6 +55,7 @@ const Side_Navbar = () => {
             {[
               { path: "/home/dashboard", label: "Dashboard" },
               { path: "/home/quotation", label: "Quotation" },
+              { path: "/home/purchase_order", label: "Purchase Order" },
             ].map((item, index) => (
               <li key={index}>
                 <NavLink

@@ -36,10 +36,6 @@ const HanumanForm = () => {
         },
       ],
       terms: "",
-      purchaseNumber: "",
-      orderAgainst: "",
-      deliveryPeriod: "",
-      placeInstallation: ""
     },
   });
 
@@ -52,33 +48,7 @@ const HanumanForm = () => {
       setValue("date", new Date().toISOString().split("T")[0]);
       setValue(
         "terms",
-        `1. Description: We are pleased to give you the work/Purchase Order against {{orderAgainst}}
-
-2. Payment Terms: 50% as in advance and the final 50% at the time of handover
-
-3. Warranty: 3 standard Year + 2 Years Extra Extended Warranty.
-
-4. Replacement: Replacement of defective goods must be changed without any charges. Our Technical team shall inspect the product upon delivery & installation, if found defective/not compliant/used the same shall be replaced without any additional costs. For defective/inferior supply we shall have legal remedy for recovery as well. In case of supply of second-hand goods / used items, the penalty of @200% cost of goods shall be implemented.
-
-5. Training: Training and Site repair must be done without any charges if required.
-
-6. Late supply Clause: If the Delivery of the order is getting delayed it will be charged 2.5% per week as a Late Delivery (LD) Terms
-
-7. Banking Details of Supplier: Proforma Invoice should be with Signature and stamp and Bank details will be there to prevent any mistake
-
-8. Delivery Period: On {{deliveryPeriod}}
-
-9. Place of Delivery: On Actual Site
-
-10. Place of Installation: {{placeInstallation}}
-
-11. Jurisdiction: In case of any dispute all jurisdiction will be in Delhi court.
-
-12. Paper Required: Company GST & PAN Card, Aadhaar Card, KYC Documents (Sign & Stamp)
-
-13. Scope of Work: All charges for local requirement at the time of Installation included in price
-
-14. Invoicing Instructions: The invoice should be prepared as follows:`
+        "Best Terms and Conditions of a company serve as a legal agreement between the business and its customers, clients, or users..."
       );
       fetchQuotationNumber();
     }
@@ -89,12 +59,6 @@ const HanumanForm = () => {
       const res = await fetch("https://vt-quotation.onrender.com/invoices/last-number");
       const data = await res.json();
       setValue("quotationNumber", data.quotationNumber + 1);
-      console.log("DATA TO BE SENT:", {
-        purchaseNumber: data.purchaseNumber,
-        orderAgainst: data.orderAgainst,
-        deliveryPeriod: data.deliveryPeriod,
-        placeInstallation: data.placeInstallation,
-      });
     } catch (error) {
       console.error("Error fetching quotation number:", error);
     }
@@ -104,32 +68,43 @@ const HanumanForm = () => {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) return alert("User not logged in. Please log in again.");
 
-    const updatedItems = data.items.map((item) => {
-      const gstAmount = (item.quantity * item.price * item.gst) / 100;
-      const totalAmount = item.quantity * item.price + gstAmount;
+    // ✅ Clean empty items (optional, but good UX)
+    const nonEmptyItems = data.items.filter(item => item.description && item.quantity && item.price);
+
+    // ✅ Calculate gstAmount and totalAmount
+    const calculatedItems = nonEmptyItems.map((item) => {
+      const quantity = Number(item.quantity) || 0;
+      const price = Number(item.price) || 0;
+      const gst = Number(item.gst) || 0;
+
+      const gstAmount = (quantity * price * gst) / 100;
+      const totalAmount = quantity * price + gstAmount;
+
       return { ...item, gstAmount, totalAmount };
     });
 
-    const subTotal = updatedItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
-    const totalGST = updatedItems.reduce((acc, item) => acc + item.gstAmount, 0);
+    // ✅ Save unique suggestions for autocomplete
+    const newSuggestions = calculatedItems.map(({ description, hsn, price, gst, model }) => ({
+      description, hsn, price, gst, model
+    }));
+
+    const stored = JSON.parse(localStorage.getItem("savedItems")) || [];
+    const updatedSuggestions = [...new Map([...stored, ...newSuggestions].map(i => [i.description, i])).values()];
+    localStorage.setItem("savedItems", JSON.stringify(updatedSuggestions));
+
+    // ✅ Totals
+    const subTotal = calculatedItems.reduce((acc, item) => acc + (item.quantity * item.price), 0);
+    const totalGST = calculatedItems.reduce((acc, item) => acc + item.gstAmount, 0);
     const grandTotal = subTotal + totalGST;
 
-    const updatedData = {
+    const finalData = {
       ...data,
       userEmail,
-      items: updatedItems,
+      items: calculatedItems,
       subTotal,
       totalGST,
       grandTotal,
     };
-
-    console.log("Data sent to backend:", updatedData);
-
-    console.log("purchaseNumber:", data.purchaseNumber);
-console.log("orderAgainst:", data.orderAgainst);
-console.log("deliveryPeriod:", data.deliveryPeriod);
-console.log("placeInstallation:", data.placeInstallation);
-
 
     try {
       const response = await fetch(
@@ -139,13 +114,13 @@ console.log("placeInstallation:", data.placeInstallation);
         {
           method: editData?._id ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedData),
+          body: JSON.stringify(finalData),
         }
       );
 
       if (response.ok) {
         alert(editData ? "Quotation updated!" : "Quotation saved!");
-        localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
+        localStorage.setItem("lastInvoice", JSON.stringify(finalData));
         navigate("/hanumanpage");
       } else {
         alert("Something went wrong");
@@ -155,6 +130,7 @@ console.log("placeInstallation:", data.placeInstallation);
       alert("Error connecting to server");
     }
   };
+
 
   const addItem = () => {
     append({
@@ -169,7 +145,6 @@ console.log("placeInstallation:", data.placeInstallation);
     });
   };
 
-
   const [savedItems, setSavedItems] = useState([]);
   const [suggestions, setSuggestions] = useState({});
 
@@ -177,14 +152,6 @@ console.log("placeInstallation:", data.placeInstallation);
     const storedItems = JSON.parse(localStorage.getItem("savedItems")) || [];
     setSavedItems(storedItems);
   }, []);
-
-  useEffect(() => {
-    register("purchaseNumber");
-    register("orderAgainst");
-    register("deliveryPeriod");
-    register("placeInstallation");
-  }, [register]);
-  
 
   const handleDescriptionChange = (index, value) => {
     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
@@ -205,10 +172,11 @@ console.log("placeInstallation:", data.placeInstallation);
     setSuggestions((prev) => ({ ...prev, [index]: [] }));
   };
 
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center text-blue-500 uppercase">
-        {editData ? "Edit PO" : "Create PO"}
+        {editData ? "Edit Quotation" : "Create Quotation"}
       </h2>
 
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -223,38 +191,33 @@ console.log("placeInstallation:", data.placeInstallation);
             <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
           <div className="space-y-3">
-            <input {...register("clientName")} placeholder="Sales Manager Name" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientAddress")} placeholder="Address" required className="w-full p-2 border rounded text-sm" />
-            <input type="number" {...register("clientContact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
-            <input type="email" {...register("clientEmail")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientGSTIN")} placeholder="GSTIN" required className="w-full p-2 border rounded text-sm" />
+            <input {...register("clientName")} placeholder="Client Name" required className="w-full p-2 border rounded text-sm" />
+            <input {...register("clientAddress")} placeholder="Client Address" required className="w-full p-2 border rounded text-sm" />
+            <input type="number" {...register("clientContact")} placeholder="Client Contact" required className="w-full p-2 border rounded text-sm" />
+            <input type="email" {...register("clientEmail")} placeholder="Client Email" required className="w-full p-2 border rounded text-sm" />
+            <input {...register("clientGSTIN")} placeholder="Client GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>
 
         {/* Date & Quotation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block font-semibold text-sm mb-1">Date</label>
             <input {...register("date")} type="date" required className="w-full p-2 border rounded text-sm" />
           </div>
           <div>
-            <label className="block font-semibold text-sm mb-1">Purchase Order No.</label>
-            <input {...register("purchaseNumber")} type="number" required className="w-full p-2 border rounded text-sm" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="block font-semibold text-sm mb-1">Purchase Order Against</label>
-            <input {...register("orderAgainst")} type="text" required className="w-full p-2 border rounded text-sm" />
+            <label className="block font-semibold text-sm mb-1">Valid Until</label>
+            <input {...register("validUntil")} type="date" required className="w-full p-2 border rounded text-sm" />
           </div>
           <div>
-            <label className="block font-semibold text-sm mb-1">Delivery Period On</label>
-            <input {...register("deliveryPeriod")} type="text" required className="w-full p-2 border rounded text-sm" />
-          </div>
-          <div>
-            <label className="block font-semibold text-sm mb-1">Place of Installation</label>
-            <input {...register("placeInstallation")} type="text" required className="w-full p-2 border rounded text-sm" />
+            <label className="block font-semibold text-sm mb-1">Quotation Number</label>
+            <input
+              {...register("quotationNumber")}
+              type="text"
+              value={watch("quotationNumber") || "Loading..."}
+              readOnly
+              className="w-full p-2 border rounded text-sm"
+            />
           </div>
         </div>
 
@@ -289,6 +252,7 @@ console.log("placeInstallation:", data.placeInstallation);
                   </ul>
                 )}
               </div>
+
               <input {...register(`items.${index}.hsn`)} placeholder="HSN" className="p-2 border rounded text-sm" />
               <input {...register(`items.${index}.quantity`)} type="number" placeholder="Qty" className="p-2 border rounded text-sm" required />
               <input {...register(`items.${index}.price`)} type="number" placeholder="Unit Price" className="p-2 border rounded text-sm" required />
@@ -314,7 +278,6 @@ console.log("placeInstallation:", data.placeInstallation);
         {/* Terms */}
         <div>
           <label className="block font-semibold text-sm mb-1">Term & Conditions</label>
-
           <textarea
             {...register("terms")}
             rows={4}
@@ -324,9 +287,9 @@ console.log("placeInstallation:", data.placeInstallation);
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-wrap gap-4 mt-6 print:hidden">
+        <div className="flex flex-wrap gap-4 mt-6">
           <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-            {editData ? "View PO" : "Submit PO"}
+            {editData ? "View Quotation" : "Submit Quotation"}
           </button>
           <button type="button" onClick={() => navigate(-1)} className="bg-zinc-400 text-white px-6 py-2 rounded hover:bg-zinc-500">
             Back
