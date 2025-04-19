@@ -27,7 +27,8 @@ const PurchaseOrder = () => {
     }
 
     try {
-      let url = "https://vt-quotation.onrender.com/invoices";
+      // let url = "https://vt-quotation.onrender.com/invoices";
+      let url = "https://vt-quotation.onrender.com/purchase-orders";
 
       if (userRole !== "admin") {
         url += `?userEmail=${userEmail}`; // regular user gets filtered data
@@ -50,7 +51,7 @@ const PurchaseOrder = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this invoice?")) {
       try {
-        await fetch(`https://vt-quotation.onrender.com/invoices/${id}`, { method: "DELETE" });
+        await fetch(`https://vt-quotation.onrender.com/purchase-orders/${id}`, { method: "DELETE" });
         setInvoices(invoices.filter((invoice) => invoice._id !== id));
         alert("Quotation deleted successfully!");
       } catch (error) {
@@ -64,16 +65,16 @@ const PurchaseOrder = () => {
     // navigate("/invoiceForm", { state: { editData: invoice } });
     console.log(invoice.companyName)
     if (invoice.companyName === "BR Biomedical Pvt Ltd") {
-      navigate("/quotation/br", { state: { editData: invoice } });
+      navigate("/purchase_order/br", { state: { editData: invoice } });
     }
     else if (invoice.companyName === "Hanuman Healthcare") {
-      navigate("/quotation/hanuman", { state: { editData: invoice } });
+      navigate("/purchase_order/hanuman", { state: { editData: invoice } });
     }
     else if (invoice.companyName === "Vego & Thomson Pvt Ltd") {
-      navigate("/quotation/vego", { state: { editData: invoice } });
+      navigate("/purchase_order/vego", { state: { editData: invoice } });
     }
     else if (invoice.companyName === "HH Corporation India") {
-      navigate("/quotation/hh", { state: { editData: invoice } });
+      navigate("/purchase_order/hh", { state: { editData: invoice } });
     }
     else {
       alert("it is not company")
@@ -157,7 +158,7 @@ const PurchaseOrder = () => {
             {invoices.length > 0 ? (
               invoices.map((invoice) => (
                 <tr key={invoice._id} className="text-center">
-                  <td className="p-2 border border-gray-300">{invoice.quotationNumber || "N/A"}</td>
+                  <td className="p-2 border border-gray-300">{invoice.purchaseNumber || "N/A"}</td>
                   <td className="p-2 border border-gray-300">{invoice.companyName || "N/A"}</td>
                   <td className="p-2 border border-gray-300">{invoice.clientName || "N/A"}</td>
                   <td className="p-2 border border-gray-300">

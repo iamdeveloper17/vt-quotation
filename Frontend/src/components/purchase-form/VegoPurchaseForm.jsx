@@ -134,8 +134,8 @@ const VegoPurchaseForm = () => {
     try {
       const response = await fetch(
         editData?._id
-          ? `https://vt-quotation.onrender.com/invoices/${editData._id}`
-          : "https://vt-quotation.onrender.com/invoices",
+          ? `https://vt-quotation.onrender.com/purchase-orders/${editData._id}`
+          : "https://vt-quotation.onrender.com/purchase-orders",
         {
           method: editData?._id ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
