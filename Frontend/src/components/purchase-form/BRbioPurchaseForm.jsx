@@ -131,31 +131,74 @@ const BRbioPurchaseForm = () => {
         console.log("placeInstallation:", data.placeInstallation);
 
 
-        try {
+        // try {
 
-            const response = await fetch(
-                editData?._id
-                  ? `https://vt-quotation.onrender.com/purchase-orders/${editData._id}`
-                  : "https://vt-quotation.onrender.com/purchase-orders",
-                {
-                  method: editData?._id ? "PUT" : "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(updatedData),
-                }
-              );
+        //     const response = await fetch(
+        //         editData?._id
+        //           ? `https://vt-quotation.onrender.com/purchase-orders/${editData._id}`
+        //           : "https://vt-quotation.onrender.com/purchase-orders",
+        //         {
+        //           method: editData?._id ? "PUT" : "POST",
+        //           headers: { "Content-Type": "application/json" },
+        //           body: JSON.stringify(updatedData),
+        //         }
+        //       );
               
 
+        //     if (response.ok) {
+        //         alert(editData ? "Quotation updated!" : "Quotation saved!");
+        //         localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
+        //         navigate("/brpurchasebiopage");
+        //     } else {
+        //         alert("Something went wrong");
+        //     }
+        // } catch (err) {
+        //     console.error("Submission error:", err);
+        //     alert("Error connecting to server");
+        // }
+
+        try {
+            const response = await fetch(
+              editData?._id
+                ? `https://vt-quotation.onrender.com/purchase-orders/${editData._id}`
+                : "https://vt-quotation.onrender.com/purchase-orders",
+              {
+                method: editData?._id ? "PUT" : "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedData),
+              }
+            );
+          
             if (response.ok) {
-                alert(editData ? "Quotation updated!" : "Quotation saved!");
-                localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
-                navigate("/brpurchasebiopage");
+              // 👇 Add this part: Save each item to the Item collection (only if it's a new purchase, not edit)
+              if (!editData) {
+                for (const item of updatedItems) {
+                  console.log("📦 Saving item to DB:", item.description); // ✅ Move inside the loop
+              
+                  await fetch("https://vt-quotation.onrender.com/items", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      description: item.description,
+                      model: item.model,
+                      hsn: item.hsn,
+                      price: item.price,
+                      gst: item.gst
+                    }),
+                  });
+                }
+              }              
+              alert(editData ? "Quotation updated!" : "Quotation saved!");
+              localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
+              navigate("/brpurchasebiopage");
             } else {
-                alert("Something went wrong");
+              alert("Something went wrong");
             }
-        } catch (err) {
+          } catch (err) {
             console.error("Submission error:", err);
             alert("Error connecting to server");
-        }
+          }
+          
     };
 
     const addItem = () => {
@@ -175,10 +218,10 @@ const BRbioPurchaseForm = () => {
     const [savedItems, setSavedItems] = useState([]);
     const [suggestions, setSuggestions] = useState({});
 
-    useEffect(() => {
-        const storedItems = JSON.parse(localStorage.getItem("savedItems")) || [];
-        setSavedItems(storedItems);
-    }, []);
+    // useEffect(() => {
+    //     const storedItems = JSON.parse(localStorage.getItem("savedItems")) || [];
+    //     setSavedItems(storedItems);
+    // }, []);
 
     useEffect(() => {
         register("purchaseNumber");
@@ -188,15 +231,29 @@ const BRbioPurchaseForm = () => {
     }, [register]);
 
 
-    const handleDescriptionChange = (index, value) => {
+    // const handleDescriptionChange = (index, value) => {
+    //     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
+
+    //     const matches = savedItems.filter((item) =>
+    //         item.description.toLowerCase().includes(value.toLowerCase())
+    //     );
+
+    //     setSuggestions((prev) => ({ ...prev, [index]: matches }));
+    // };
+
+    const handleDescriptionChange = async (index, value) => {
         if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
-
-        const matches = savedItems.filter((item) =>
-            item.description.toLowerCase().includes(value.toLowerCase())
-        );
-
-        setSuggestions((prev) => ({ ...prev, [index]: matches }));
-    };
+      
+        try {
+          const res = await fetch(`https://vt-quotation.onrender.com/items/search?query=${value}`);
+          const data = await res.json();
+      
+          setSuggestions((prev) => ({ ...prev, [index]: data }));
+        } catch (err) {
+          console.error("❌ Error fetching suggestions:", err);
+        }
+      };
+      
 
     const handleSelectSuggestion = (index, item) => {
         setValue(`items.${index}.description`, item.description);

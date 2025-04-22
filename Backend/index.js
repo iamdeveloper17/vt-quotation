@@ -10,6 +10,7 @@ require("dotenv").config();
 const { InvoiceModel, Counter } = require("./models/Invoice");
 const adminOnly = require("./middleware/adminOnly");
 const PurchaseOrderModel = require("./models/PurchaseOrder");
+const Item = require("./models/Item");
 
 // const JWT_SECRET = "your_secret_key"; // Replace with a strong secret key
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
@@ -455,15 +456,15 @@ app.put("/admin/users/:id/permissions", adminOnly, async (req, res) => {
   }
 });
 
-app.get("/items/search", async (req, res) => {
-  const { query } = req.query;
-  try {
-    const items = await ItemModel.find({ description: { $regex: query, $options: "i" } }).limit(5);
-    res.json(items);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
+// app.get("/items/search", async (req, res) => {
+//   const { query } = req.query;
+//   try {
+//     const items = await ItemModel.find({ description: { $regex: query, $options: "i" } }).limit(5);
+//     res.json(items);
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
 
 
 // CREATE Purchase Order
@@ -539,6 +540,61 @@ app.get("/auth/refresh", verifyToken, async (req, res) => {
   }
 });
 
+
+// app.post("/items", async (req, res) => {
+//   try {
+//     const newItem = new Item(req.body);
+//     await newItem.save();
+//     res.status(201).json({ message: "Item saved", item: newItem });
+//   } catch (error) {
+//     console.error("Error saving item:", error);
+//     res.status(500).json({ message: "Error saving item" });
+//   }
+// });
+
+// app.post("/items", async (req, res) => {
+//   try {
+//     const { description, model } = req.body;
+
+//     const existing = await Item.findOne({ description, model });
+//     if (existing) {
+//       return res.status(200).json({ message: "Item already exists", item: existing });
+//     }
+
+//     const newItem = new Item(req.body);
+//     await newItem.save();
+//     res.status(201).json({ message: "Item saved", item: newItem });
+//   } catch (error) {
+//     console.error("Error saving item:", error);
+//     res.status(500).json({ message: "Error saving item" });
+//   }
+// });
+
+app.post("/items", async (req, res) => {
+  try {
+    const { description, model, hsn, price, gst } = req.body;
+    const existing = await Item.findOne({ description, model });
+    if (existing) {
+      return res.status(200).json({ message: "Item already exists", item: existing });
+    }
+    const newItem = new Item({ description, model, hsn, price, gst });
+    await newItem.save();
+    res.status(201).json({ message: "Item saved", item: newItem });
+  } catch (err) {
+    console.error("❌ Error saving item:", err);
+    res.status(500).json({ message: "Error saving item" });
+  }
+});
+
+app.get("/items/search", async (req, res) => {
+  const { query } = req.query;
+  try {
+    const items = await Item.find({ description: { $regex: query, $options: "i" } }).limit(5);
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 
