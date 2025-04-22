@@ -1,0 +1,23 @@
+  @import "tailwindcss";
+
+  @media print {
+    body {
+      -webkit-print-color-adjust: exact; /* Ensures colors are printed correctly */
+    }
+    /* Hide unwanted elements */
+    .no-print {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    .print\\:hidden {
+      display: none !important;
+    }
+
+    @page {
+      margin: 0; /* Removes default browser margins */
+      size: auto; /* Adjusts to the content size */
+    }
+
+  }
+  

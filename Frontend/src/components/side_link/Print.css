@@ -1,0 +1,52 @@
+/* @media print {
+  body {
+    background-color: white !important;
+  }
+} */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 20mm;
+  }
+
+  .print\\:table {
+    display: table !important;
+    width: 100%;
+  }
+
+  .print\\:table-header-group {
+    display: table-header-group !important;
+  }
+
+  .print\\:table-row-group {
+    display: table-row-group !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  
+  td, th {
+    word-wrap: break-word;
+    vertical-align: top;
+  }
+  
+}
+
+
