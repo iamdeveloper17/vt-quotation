@@ -258,15 +258,29 @@ const HanumanPurchaseForm = () => {
   }, [register]);
 
 
-  const handleDescriptionChange = (index, value) => {
+  // const handleDescriptionChange = (index, value) => {
+  //   if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
+
+  //   const matches = savedItems.filter((item) =>
+  //     item.description.toLowerCase().includes(value.toLowerCase())
+  //   );
+
+  //   setSuggestions((prev) => ({ ...prev, [index]: matches }));
+  // };
+
+  const handleDescriptionChange = async (index, value) => {
     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
-
-    const matches = savedItems.filter((item) =>
-      item.description.toLowerCase().includes(value.toLowerCase())
-    );
-
-    setSuggestions((prev) => ({ ...prev, [index]: matches }));
+  
+    try {
+      const res = await fetch(`https://vt-quotation.onrender.com/items/search?query=${value}`);
+      const data = await res.json();
+  
+      setSuggestions((prev) => ({ ...prev, [index]: data }));
+    } catch (err) {
+      console.error("❌ Error fetching item suggestions:", err);
+    }
   };
+  
 
   const handleSelectSuggestion = (index, item) => {
     setValue(`items.${index}.description`, item.description);

@@ -241,18 +241,6 @@ const BRbioPurchaseForm = () => {
     //     setSuggestions((prev) => ({ ...prev, [index]: matches }));
     // };
 
-    // const handleDescriptionChange = async (index, value) => {
-    //     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
-      
-    //     try {
-    //       const res = await fetch(`https://vt-quotation.onrender.com/items/search?query=${value}`);
-    //       const data = await res.json();
-      
-    //       setSuggestions((prev) => ({ ...prev, [index]: data }));
-    //     } catch (err) {
-    //       console.error("❌ Error fetching suggestions:", err);
-    //     }
-    //   };
     const handleDescriptionChange = async (index, value) => {
         if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
       
@@ -262,7 +250,7 @@ const BRbioPurchaseForm = () => {
       
           setSuggestions((prev) => ({ ...prev, [index]: data }));
         } catch (err) {
-          console.error("❌ Error fetching item suggestions:", err);
+          console.error("❌ Error fetching suggestions:", err);
         }
       };
       
