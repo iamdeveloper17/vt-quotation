@@ -156,6 +156,76 @@ const HanumanPurchaseForm = () => {
   //   }
   // };
 
+  // const onSubmit = async (data) => {
+  //   const userEmail = localStorage.getItem("userEmail");
+  //   if (!userEmail) return alert("User not logged in. Please log in again.");
+  
+  //   const updatedItems = data.items.map((item) => {
+  //     const gstAmount = (item.quantity * item.price * item.gst) / 100;
+  //     const totalAmount = item.quantity * item.price + gstAmount;
+  //     return { ...item, gstAmount, totalAmount };
+  //   });
+  
+  //   const subTotal = updatedItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
+  //   const totalGST = updatedItems.reduce((acc, item) => acc + item.gstAmount, 0);
+  //   const grandTotal = subTotal + totalGST;
+  
+  //   const updatedData = {
+  //     ...data,
+  //     userEmail,
+  //     items: updatedItems,
+  //     subTotal,
+  //     totalGST,
+  //     grandTotal,
+  //   };
+  
+  //   console.log("Data sent to backend:", updatedData);
+  
+  //   try {
+  //     const response = await fetch(
+  //       editData?._id
+  //         ? `https://vt-quotation.onrender.com/purchase-orders/${editData._id}`
+  //         : "https://vt-quotation.onrender.com/purchase-orders",
+  //       {
+  //         method: editData?._id ? "PUT" : "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify(updatedData),
+  //       }
+  //     );
+  
+  //     if (response.ok) {
+  //       // 🟢 Save new items to the Item collection (only for new POs)
+  //       if (!editData) {
+  //         for (const item of updatedItems) {
+  //           try {
+  //             await fetch("https://vt-quotation.onrender.com/items", {
+  //               method: "POST",
+  //               headers: { "Content-Type": "application/json" },
+  //               body: JSON.stringify({
+  //                 description: item.description,
+  //                 model: item.model,
+  //                 hsn: item.hsn,
+  //                 price: item.price,
+  //                 gst: item.gst,
+  //               }),
+  //             });
+  //           } catch (err) {
+  //             console.error("❌ Failed to save item to DB:", item.description, err);
+  //           }
+  //         }
+  //       }
+  
+  //       alert(editData ? "Quotation updated!" : "Quotation saved!");
+  //       localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
+  //       navigate("/hanumanpurchasepage");
+  //     } else {
+  //       alert("Something went wrong");
+  //     }
+  //   } catch (err) {
+  //     console.error("Submission error:", err);
+  //     alert("Error connecting to server");
+  //   }
+  // };
   const onSubmit = async (data) => {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) return alert("User not logged in. Please log in again.");
@@ -179,54 +249,54 @@ const HanumanPurchaseForm = () => {
       grandTotal,
     };
   
-    console.log("Data sent to backend:", updatedData);
-  
     try {
-      const response = await fetch(
-        editData?._id
-          ? `https://vt-quotation.onrender.com/purchase-orders/${editData._id}`
-          : "https://vt-quotation.onrender.com/purchase-orders",
-        {
-          method: editData?._id ? "PUT" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedData),
-        }
-      );
+      const url = editData?._id
+        ? `https://vt-quotation.onrender.com/purchase-orders/${editData._id}`
+        : "https://vt-quotation.onrender.com/purchase-orders";
+  
+      const method = editData?._id ? "PUT" : "POST";
+  
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
   
       if (response.ok) {
-        // 🟢 Save new items to the Item collection (only for new POs)
+        // Save items if new purchase order only
         if (!editData) {
           for (const item of updatedItems) {
-            try {
-              await fetch("https://vt-quotation.onrender.com/items", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  description: item.description,
-                  model: item.model,
-                  hsn: item.hsn,
-                  price: item.price,
-                  gst: item.gst,
-                }),
-              });
-            } catch (err) {
-              console.error("❌ Failed to save item to DB:", item.description, err);
-            }
+            await fetch("https://vt-quotation.onrender.com/items", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                description: item.description,
+                model: item.model,
+                hsn: item.hsn,
+                price: item.price,
+                gst: item.gst,
+              }),
+            });
           }
         }
   
-        alert(editData ? "Quotation updated!" : "Quotation saved!");
-        localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
-        navigate("/hanumanpurchasepage");
+        const savedData = await response.json();
+  
+        alert(editData ? "Purchase Order updated!" : "Purchase Order saved!");
+        localStorage.setItem("lastInvoice", JSON.stringify({
+          ...updatedData,
+          _id: editData?._id || savedData.id
+        }));
+  
+        navigate("/brpurchasebiopage");
       } else {
-        alert("Something went wrong");
+        alert("Something went wrong while saving.");
       }
     } catch (err) {
       console.error("Submission error:", err);
       alert("Error connecting to server");
     }
   };
-
   
   const addItem = () => {
     append({

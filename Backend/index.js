@@ -107,20 +107,7 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // ✅ First: Check if it's the predefined admin
-    // if (email === "admin@secret.com" && password === "cipher123") {
-    //   const token = jwt.sign({ userId: "admin-static-id", role: "admin" }, JWT_SECRET, { expiresIn: "2h" });
-    
-    //   return res.status(200).json({
-    //     message: "Admin login successful",
-    //     token,
-    //     user: {
-    //       name: "Admin User",
-    //       email,
-    //       role: "admin"
-    //     },
-    //   });
-    // }
+
     if (email === "admin@secret.com" && password === "cipher123") {
       const token = jwt.sign({ userId: "admin-static-id", role: "admin" }, JWT_SECRET, { expiresIn: "2h" });
     
@@ -151,15 +138,6 @@ app.post("/login", async (req, res) => {
       { expiresIn: "2h" }
     );
 
-    // res.status(200).json({
-    //   message: "Login successful",
-    //   token,
-    //   user: {
-    //     name: user.name,
-    //     email: user.email,
-    //     role: user.role,
-    //   },
-    // });
     res.status(200).json({
       message: "Login successful",
       token,
@@ -391,17 +369,6 @@ app.put("/invoices/:id", async (req, res) => {
   }
 });
 
-
-
-// app.get("/admin/users", adminOnly, async (req, res) => {
-//   try {
-//     const users = await EmployeeModel.find().select("-password"); // hide passwords
-//     res.json(users);
-//   } catch (error) {
-//     res.status(500).json({ message: "Error fetching users" });
-//   }
-// });
-
 app.get("/admin/users", adminOnly, async (req, res) => {
   try {
     console.log("Admin user accessing users list:", req.user); // 🧠 Log who's calling it
@@ -456,28 +423,64 @@ app.put("/admin/users/:id/permissions", adminOnly, async (req, res) => {
   }
 });
 
-// app.get("/items/search", async (req, res) => {
-//   const { query } = req.query;
+
+// CREATE Purchase Order
+// app.post("/purchase-orders", async (req, res) => {
 //   try {
-//     const items = await ItemModel.find({ description: { $regex: query, $options: "i" } }).limit(5);
-//     res.json(items);
+//     const { purchaseNumber, userEmail, ...rest } = req.body;
+
+//     if (!userEmail) {
+//       return res.status(400).json({ message: "User email is required" });
+//     }
+
+//     // ✅ Check if order with same purchaseNumber and user already exists
+//     const existingOrder = await PurchaseOrderModel.findOne({ purchaseNumber});
+
+//     if (existingOrder) {
+//       // ✅ Update instead of duplicate
+//       const updatedOrder = await PurchaseOrderModel.findOneAndUpdate(
+//         { purchaseNumber},
+//         { purchaseNumber, userEmail, ...rest },
+//         { new: true }
+//       );
+//       return res.status(200).json({ message: "Purchase order updated", id: updatedOrder._id });
+//     }
+
+//     // ✅ Otherwise, create new
+//     const newOrder = new PurchaseOrderModel({ purchaseNumber, userEmail, ...rest });
+//     await newOrder.save();
+//     res.status(201).json({ message: "Purchase order saved", id: newOrder._id });
+
 //   } catch (error) {
+//     console.error("Error saving purchase order:", error);
 //     res.status(500).json({ message: "Server error" });
 //   }
 // });
-
-
-// CREATE Purchase Order
 app.post("/purchase-orders", async (req, res) => {
   try {
-    const newOrder = new PurchaseOrderModel(req.body);
+    const { _id, userEmail, ...rest } = req.body;
+
+    if (!userEmail) {
+      return res.status(400).json({ message: "User email is required" });
+    }
+
+    if (_id) {
+      // ✅ If _id exists, it's an update
+      const updatedOrder = await PurchaseOrderModel.findByIdAndUpdate(_id, { userEmail, ...rest }, { new: true });
+      return res.status(200).json({ message: "Purchase order updated", id: updatedOrder._id });
+    }
+
+    // ✅ If no _id, it's a new entry
+    const newOrder = new PurchaseOrderModel({ userEmail, ...rest });
     await newOrder.save();
-    res.status(201).json({ message: "Purchase order saved successfully", id: newOrder._id });
+    res.status(201).json({ message: "Purchase order saved", id: newOrder._id });
+
   } catch (error) {
     console.error("Error saving purchase order:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 // GET All Purchase Orders
 app.get("/purchase-orders", async (req, res) => {
@@ -540,35 +543,6 @@ app.get("/auth/refresh", verifyToken, async (req, res) => {
   }
 });
 
-
-// app.post("/items", async (req, res) => {
-//   try {
-//     const newItem = new Item(req.body);
-//     await newItem.save();
-//     res.status(201).json({ message: "Item saved", item: newItem });
-//   } catch (error) {
-//     console.error("Error saving item:", error);
-//     res.status(500).json({ message: "Error saving item" });
-//   }
-// });
-
-// app.post("/items", async (req, res) => {
-//   try {
-//     const { description, model } = req.body;
-
-//     const existing = await Item.findOne({ description, model });
-//     if (existing) {
-//       return res.status(200).json({ message: "Item already exists", item: existing });
-//     }
-
-//     const newItem = new Item(req.body);
-//     await newItem.save();
-//     res.status(201).json({ message: "Item saved", item: newItem });
-//   } catch (error) {
-//     console.error("Error saving item:", error);
-//     res.status(500).json({ message: "Error saving item" });
-//   }
-// });
 
 app.post("/items", async (req, res) => {
   try {
