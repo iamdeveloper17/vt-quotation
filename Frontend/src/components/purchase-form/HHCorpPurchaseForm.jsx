@@ -129,11 +129,40 @@ const HHCorpPurchaseForm = () => {
         }
       );
 
+      // if (response.ok) {
+      //   alert(editData ? "Quotation updated!" : "Quotation saved!");
+      //   localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
+      //   navigate("/hhpurchasepage");
+      // } 
       if (response.ok) {
+        // ✅ Save each item to item schema if this is a new PO (not edit)
+        if (!editData) {
+          for (const item of updatedItems) {
+            try {
+              const res = await fetch("https://vt-quotation.onrender.com/items", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  description: item.description,
+                  model: item.model,
+                  hsn: item.hsn,
+                  price: item.price,
+                  gst: item.gst,
+                }),
+              });
+              const result = await res.json();
+              console.log("✅ Item saved:", result.message);
+            } catch (err) {
+              console.error("❌ Error saving item:", err);
+            }
+          }
+        }
+
         alert(editData ? "Quotation updated!" : "Quotation saved!");
         localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
         navigate("/hhpurchasepage");
-      } else {
+      }
+      else {
         alert("Something went wrong");
       }
     } catch (err) {

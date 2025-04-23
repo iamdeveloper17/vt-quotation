@@ -257,17 +257,6 @@ const HanumanPurchaseForm = () => {
     register("placeInstallation");
   }, [register]);
 
-
-  // const handleDescriptionChange = (index, value) => {
-  //   if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
-
-  //   const matches = savedItems.filter((item) =>
-  //     item.description.toLowerCase().includes(value.toLowerCase())
-  //   );
-
-  //   setSuggestions((prev) => ({ ...prev, [index]: matches }));
-  // };
-
   const handleDescriptionChange = async (index, value) => {
     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
   
