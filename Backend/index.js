@@ -586,6 +586,18 @@ app.post("/items", async (req, res) => {
   }
 });
 
+// ✅ GET all items (for admin table view)
+app.get("/items", async (req, res) => {
+  try {
+    const items = await Item.find().sort({ description: 1 });
+    res.json(items);
+  } catch (error) {
+    console.error("❌ Error fetching items:", error);
+    res.status(500).json({ message: "Error fetching items" });
+  }
+});
+
+
 app.get("/items/search", async (req, res) => {
   const { query } = req.query;
   try {

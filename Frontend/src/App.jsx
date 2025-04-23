@@ -28,6 +28,7 @@ import BRbioPurchaseForm from './components/purchase-form/BRbioPurchaseForm';
 import BRbioPurchasePage from './components/purchase-form/BRbioPurchasePage';
 import VegoPurchaseForm from './components/purchase-form/VegoPurchaseForm';
 import VegoPurchasePage from './components/purchase-form/VegoPurchasePage';
+import AdminItems from './components/side_link/AdminItems';
 
 const App = () => {
   return (
@@ -42,6 +43,7 @@ const App = () => {
             <Route path='quotation' element={<Quotation />} />
             <Route path="adminusers" element={<AdminUsers />} />
             <Route path="purchase_order" element={<PurchaseOrder />} />
+            <Route path="admin_items" element={<AdminItems />} />
           </Route>
           <Route path='/quotation/br' element={<PrivateRoute><BRbioForm /></PrivateRoute>} />
           <Route path='/brbiopage' element={<PrivateRoute><BRbioPage /></PrivateRoute>} />

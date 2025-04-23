@@ -110,6 +110,7 @@ const Side_Navbar = () => {
 
             {/* Admin-only option */}
             {userRole === "admin" && (
+              <>
               <li>
                 <NavLink
                   to="/home/adminusers"
@@ -124,6 +125,22 @@ const Side_Navbar = () => {
                   Users
                 </NavLink>
               </li>
+              <li>
+              <NavLink
+                to="/home/admin_items"
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  `block px-4 py-2 rounded-md font-medium transition-all duration-300 ${
+                    isActive
+                      ? "bg-[#B5A680] text-[#343148FF]"
+                      : "hover:bg-[#968054] hover:text-[#343148FF]"
+                  }`
+                }
+              >
+                Items
+              </NavLink>
+            </li>
+            </>
             )}
           </ul>
         </nav>
