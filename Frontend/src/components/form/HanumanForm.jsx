@@ -119,6 +119,27 @@ const HanumanForm = () => {
       );
 
       if (response.ok) {
+        // ✅ Save new items to backend Item collection
+        if (!editData) {
+          for (const item of calculatedItems) {
+            try {
+              await fetch("https://vt-quotation.onrender.com/items", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  description: item.description,
+                  model: item.model,
+                  hsn: item.hsn,
+                  price: item.price,
+                  gst: item.gst,
+                }),
+              });
+            } catch (error) {
+              console.error("❌ Failed to save item to backend:", item.description);
+            }
+          }
+        }
+
         alert(editData ? "Quotation updated!" : "Quotation saved!");
         localStorage.setItem("lastInvoice", JSON.stringify(finalData));
         navigate("/hanumanpage");
@@ -153,14 +174,15 @@ const HanumanForm = () => {
     setSavedItems(storedItems);
   }, []);
 
-  const handleDescriptionChange = (index, value) => {
+  const handleDescriptionChange = async (index, value) => {
     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
-
-    const matches = savedItems.filter((item) =>
-      item.description.toLowerCase().includes(value.toLowerCase())
-    );
-
-    setSuggestions((prev) => ({ ...prev, [index]: matches }));
+    try {
+      const res = await fetch(`https://vt-quotation.onrender.com/items/search?query=${value}`);
+      const data = await res.json();
+      setSuggestions((prev) => ({ ...prev, [index]: data }));
+    } catch (err) {
+      console.error("❌ Error fetching suggestions:", err);
+    }
   };
 
   const handleSelectSuggestion = (index, item) => {

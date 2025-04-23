@@ -119,8 +119,29 @@ const BRbioForm = () => {
       );
 
       if (response.ok) {
+        // ✅ Save items only for new quotations
+        if (!editData) {
+          for (const item of updatedItems) {
+            try {
+              await fetch("https://vt-quotation.onrender.com/items", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  description: item.description,
+                  model: item.model,
+                  hsn: item.hsn,
+                  price: item.price,
+                  gst: item.gst,
+                }),
+              });
+            } catch (err) {
+              console.error("❌ Failed to save item:", item.description, err);
+            }
+          }
+        }
+
         alert(editData ? "Quotation updated!" : "Quotation saved!");
-        localStorage.setItem("lastInvoice", JSON.stringify(finalData));
+        localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
         navigate("/brbiopage");
       } else {
         alert("Something went wrong");
@@ -153,14 +174,16 @@ const BRbioForm = () => {
     setSavedItems(storedItems);
   }, []);
 
-  const handleDescriptionChange = (index, value) => {
+  const handleDescriptionChange = async (index, value) => {
     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
 
-    const matches = savedItems.filter((item) =>
-      item.description.toLowerCase().includes(value.toLowerCase())
-    );
-
-    setSuggestions((prev) => ({ ...prev, [index]: matches }));
+    try {
+      const res = await fetch(`https://vt-quotation.onrender.com/items/search?query=${value}`);
+      const data = await res.json();
+      setSuggestions((prev) => ({ ...prev, [index]: data }));
+    } catch (err) {
+      console.error("❌ Error fetching suggestions:", err);
+    }
   };
 
   const handleSelectSuggestion = (index, item) => {

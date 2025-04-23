@@ -9,11 +9,11 @@ const VegoPurchaseForm = () => {
 
   const { register, control, handleSubmit, setValue, watch, reset } = useForm({
     defaultValues: {
-        companyName: "Vego & Thomson Pvt Ltd",
-        companyAddress: "D-71, MALVIYA NAGAR, NEW DLEHI, South Delhi, Delhi, 110017",
-        companyContact: "18002124669",
-        companyEmail: "contact@vegothomsonindia.com",
-        companyGSTIN: "07AAHCV1780G1Z7",
+      companyName: "Vego & Thomson Pvt Ltd",
+      companyAddress: "D-71, MALVIYA NAGAR, NEW DLEHI, South Delhi, Delhi, 110017",
+      companyContact: "18002124669",
+      companyEmail: "contact@vegothomsonindia.com",
+      companyGSTIN: "07AAHCV1780G1Z7",
       quotationNumber: "",
       date: "",
       validUntil: "",
@@ -144,6 +144,28 @@ const VegoPurchaseForm = () => {
       );
 
       if (response.ok) {
+        if (!editData) {
+          for (const item of updatedItems) {
+            try {
+              const res = await fetch("https://vt-quotation.onrender.com/items", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  description: item.description,
+                  model: item.model,
+                  hsn: item.hsn,
+                  price: item.price,
+                  gst: item.gst,
+                }),
+              });
+              const result = await res.json();
+              console.log("✅ Item saved:", result.message);
+            } catch (err) {
+              console.error("❌ Error saving item:", err);
+            }
+          }
+        }
+
         alert(editData ? "Quotation updated!" : "Quotation saved!");
         localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
         navigate("/vegopurchasepage");
@@ -186,14 +208,16 @@ const VegoPurchaseForm = () => {
   }, [register]);
 
 
-  const handleDescriptionChange = (index, value) => {
+  const handleDescriptionChange = async (index, value) => {
     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
 
-    const matches = savedItems.filter((item) =>
-      item.description.toLowerCase().includes(value.toLowerCase())
-    );
-
-    setSuggestions((prev) => ({ ...prev, [index]: matches }));
+    try {
+      const res = await fetch(`https://vt-quotation.onrender.com/items/search?query=${value}`);
+      const data = await res.json();
+      setSuggestions((prev) => ({ ...prev, [index]: data }));
+    } catch (err) {
+      console.error("❌ Error fetching suggestions:", err);
+    }
   };
 
   const handleSelectSuggestion = (index, item) => {
