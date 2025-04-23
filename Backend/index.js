@@ -608,8 +608,15 @@ app.get("/items/search", async (req, res) => {
   }
 });
 
-
-
+app.delete("/items/:id", async (req, res) => {
+  try {
+    await Item.findByIdAndDelete(req.params.id);
+    res.json({ message: "Item deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting item:", error);
+    res.status(500).json({ message: "Error deleting item" });
+  }
+});
 
 const port = process.env.PORT;
 

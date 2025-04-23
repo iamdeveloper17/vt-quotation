@@ -47,15 +47,6 @@ const PurchaseOrder = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const canCreateQuotation = localStorage.getItem("canCreateQuotation");
-  //   if (canCreateQuotation !== "true") {
-  //     navigate("/unauthorized"); // or show a message
-  //   }
-  // }, []);
-
-
-
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this invoice?")) {
       try {
