@@ -215,7 +215,7 @@ const PurchaseOrder = () => {
         {invoices.length > 0 ? (
           invoices.map((invoice) => (
             <div key={invoice._id} className="bg-white shadow-sm rounded-md p-4">
-              <p><strong>Quotation No:</strong> {invoice.quotationNumber || "N/A"}</p>
+              <p><strong>Purchase Order No:</strong> {invoice.purchaseNumber || "N/A"}</p>
               <p><strong>Company:</strong> {invoice.companyName || "N/A"}</p>
               <p><strong>Client:</strong> {invoice.clientName || "N/A"}</p>
               <p><strong>Date:</strong> {invoice.date ? new Date(invoice.date).toLocaleDateString() : "N/A"}</p>
