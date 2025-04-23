@@ -102,7 +102,7 @@ const VegoForm = () => {
       if (response.ok) {
         // ✅ Save new items to backend Item collection
         if (!editData) {
-          for (const item of calculatedItems) {
+          for (const item of updatedItems) {
             try {
               await fetch("https://vt-quotation.onrender.com/items", {
                 method: "POST",
@@ -122,7 +122,7 @@ const VegoForm = () => {
         }
 
         alert(editData ? "Quotation updated!" : "Quotation saved!");
-        localStorage.setItem("lastInvoice", JSON.stringify(finalData));
+        localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
         navigate("/hanumanpage");
       } else {
         alert("Something went wrong");

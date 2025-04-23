@@ -58,54 +58,36 @@ const HanumanPage = () => {
   };
 
   const handleCleanPrint = () => {
+    const customTitle = `Quotation-${formData.quotationNumber}`;
     const content = document.getElementById("invoice").innerHTML;
-
-    const iframe = document.createElement("iframe");
-    iframe.style.position = "fixed";
-    iframe.style.right = "0";
-    iframe.style.bottom = "0";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
-    iframe.style.border = "0";
-
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(`
+  
+    const printWindow = window.open("", "_blank", "width=800,height=600");
+    if (!printWindow) return alert("Popup blocked. Please allow popups for this site.");
+  
+    printWindow.document.open();
+    printWindow.document.write(`
       <html>
         <head>
-          <title>Invoice</title>
+          <title>${customTitle}</title>
           <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-           <style>
+          <style>
             @media print {
-              .no-print {
-                display: none !important;
-                visibility: hidden !important;
-              }
+              .no-print { display: none !important; visibility: hidden !important; }
               @page {
                 margin: 0 !important;
                 padding: 0 40px 35px 40px !important;
                 size: A4;
               }
-              body {
-                margin: 0 !important;
-              }
+              body { margin: 0 !important; }
             }
           </style>
         </head>
-        <body>${content}</body>
+        <body onload="window.print(); setTimeout(() => window.close(), 100);">
+          ${content}
+        </body>
       </html>
     `);
-    doc.close();
-
-    iframe.onload = () => {
-      setTimeout(() => {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-        document.body.removeChild(iframe);
-      }, 500);
-    };
+    printWindow.document.close();
   };
 
   return (

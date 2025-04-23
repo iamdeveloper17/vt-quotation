@@ -142,7 +142,7 @@ const HHCorpForm = () => {
 
         alert(editData ? "Quotation updated!" : "Quotation saved!");
         localStorage.setItem("lastInvoice", JSON.stringify(finalData));
-        navigate("/hanumanpage");
+        navigate("/hhpage");
       } else {
         alert("Something went wrong");
       }

@@ -121,7 +121,7 @@ const BRbioForm = () => {
       if (response.ok) {
         // ✅ Save items only for new quotations
         if (!editData) {
-          for (const item of updatedItems) {
+          for (const item of calculatedItems) {
             try {
               await fetch("https://vt-quotation.onrender.com/items", {
                 method: "POST",
@@ -141,7 +141,7 @@ const BRbioForm = () => {
         }
 
         alert(editData ? "Quotation updated!" : "Quotation saved!");
-        localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
+        localStorage.setItem("lastInvoice", JSON.stringify(finalData));
         navigate("/brbiopage");
       } else {
         alert("Something went wrong");
