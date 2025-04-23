@@ -45,7 +45,7 @@ const AdminItems = () => {
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-2xl font-bold mb-4 uppercase text-center text-[#343148FF]">
-        Item Suggestions
+        Items List
       </h2>
 
       {/* ✅ DESKTOP TABLE VIEW */}

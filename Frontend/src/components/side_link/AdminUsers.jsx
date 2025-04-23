@@ -12,7 +12,7 @@ const AdminUsers = () => {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
-        console.log("Fetched users:", res.data); // 👀 Add this
+        console.log("Fetched users:", res.data);
         setUsers(res.data);
       } catch (error) {
         console.error("Failed to load users", error);
@@ -22,15 +22,11 @@ const AdminUsers = () => {
     fetchAllUsers();
   }, []);
 
-
   const handlePermissionChange = async (userId, field, value) => {
     const token = localStorage.getItem("token");
-
-    // ✅ First: Find the existing user object
     const user = users.find((u) => u._id === userId);
     if (!user) return alert("User not found");
 
-    // ✅ Prepare updated permissions by copying current values and updating the changed one
     const updatedPermissions = {
       canCreateQuotation: field === "canCreateQuotation" ? value : user.canCreateQuotation,
       canCreatePurchaseOrder: field === "canCreatePurchaseOrder" ? value : user.canCreatePurchaseOrder,
@@ -47,14 +43,11 @@ const AdminUsers = () => {
         }
       );
 
-      // ✅ Update frontend state
       setUsers((prevUsers) =>
         prevUsers.map((u) =>
           u._id === userId ? { ...u, ...updatedPermissions } : u
         )
       );
-      console.log(`🔄 Updated ${field} for user ${user.email}:`, value);
-      console.log("🗃️ Full updated permissions:", updatedPermissions);
       alert("✅ Permissions updated");
     } catch (error) {
       console.error("Failed to update user permissions", error);
@@ -81,12 +74,13 @@ const AdminUsers = () => {
     }
   };
 
-
-
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 uppercase text-center text-[#343148FF]">Users List</h2>
+      <h2 className="text-2xl font-bold mb-4 uppercase text-center text-[#343148FF]">
+        Users List
+      </h2>
 
+      {/* ✅ DESKTOP TABLE VIEW */}
       <div className="hidden md:block mt-4 h-[500px] overflow-y-auto shadow-xl border border-gray-300 rounded-lg">
         <table className="w-full table-auto border-collapse">
           <thead className="sticky top-0 bg-[#D7C49EFF]">
@@ -119,7 +113,6 @@ const AdminUsers = () => {
                         {user.canCreateQuotation ? "Allowed" : "Not Allowed"}
                       </span>
                     </div>
-
                   </td>
                   <td className="p-2 border border-gray-300">
                     <div className="flex items-center justify-center gap-2">
@@ -134,7 +127,6 @@ const AdminUsers = () => {
                         {user.canCreatePurchaseOrder ? "Allowed" : "Not Allowed"}
                       </span>
                     </div>
-
                   </td>
                   <td className="p-2 border border-gray-300 whitespace-nowrap">
                     <button
@@ -148,15 +140,56 @@ const AdminUsers = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="8" className="h-96 p-4">
-                  <div className="flex justify-center items-center h-full w-full text-center text-gray-700">
-                    No users found
-                  </div>
+                <td colSpan="6" className="h-96 p-4 text-center text-gray-600">
+                  No users found
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* ✅ MOBILE CARD VIEW */}
+      <div className="block md:hidden mt-4 max-h-[68vh] overflow-y-auto space-y-4 bg-[#D7C49EFF] rounded-md p-2 shadow-xl">
+        {users.length > 0 ? (
+          users.map((user) => (
+            <div key={user._id} className="bg-white shadow-sm rounded-md p-4 space-y-2">
+              <p><strong>Name:</strong> {user.name}</p>
+              <p><strong>Email:</strong> {user.email}</p>
+              <p><strong>Role:</strong> {user.role}</p>
+              <p>
+                <strong>Can Create Quotation:</strong>
+                <input
+                  type="checkbox"
+                  className="ml-2"
+                  checked={user.canCreateQuotation}
+                  onChange={(e) =>
+                    handlePermissionChange(user._id, "canCreateQuotation", e.target.checked)
+                  }
+                />
+              </p>
+              <p>
+                <strong>Can Create Purchase Order:</strong>
+                <input
+                  type="checkbox"
+                  className="ml-2"
+                  checked={user.canCreatePurchaseOrder}
+                  onChange={(e) =>
+                    handlePermissionChange(user._id, "canCreatePurchaseOrder", e.target.checked)
+                  }
+                />
+              </p>
+              <button
+                onClick={() => handleDelete(user._id)}
+                className="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-600">No users found</p>
+        )}
       </div>
     </div>
   );
