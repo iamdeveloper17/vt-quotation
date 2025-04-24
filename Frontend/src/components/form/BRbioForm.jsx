@@ -119,6 +119,28 @@ const BRbioForm = () => {
       );
 
       if (response.ok) {
+        const clientRes = await fetch("https://vt-quotation.onrender.com/clients", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: data.clientName,
+            address: data.clientAddress,
+            contact: data.clientContact,
+            email: data.clientEmail,
+            gstin: data.clientGSTIN,
+          }),
+        });
+        // const clientResult = await clientRes.json();
+        // console.log("✅ Client Save Response:", clientResult);
+if (clientRes.ok) {
+  const clientResult = await clientRes.json();
+  console.log("✅ Client Save Response:", clientResult);
+} else {
+  const errorText = await clientRes.text();
+  console.error("❌ Client save failed. Response:", errorText);
+}
+
+        
         // ✅ Save items only for new quotations
         if (!editData) {
           for (const item of calculatedItems) {
@@ -195,6 +217,48 @@ const BRbioForm = () => {
     setSuggestions((prev) => ({ ...prev, [index]: [] }));
   };
 
+  // Autofill client details on email blur
+  const handleClientEmailBlur = async (e) => {
+    const email = e.target.value;
+    if (!email) return;
+  
+    try {
+      const res = await fetch(`https://vt-quotation.onrender.com/clients?email=${email}`);
+      if (res.ok) {
+        const client = await res.json();
+        setValue("clientName", client.name || "");
+        setValue("clientAddress", client.address || "");
+        setValue("clientContact", client.contact || "");
+        setValue("clientGSTIN", client.gstin || "");
+      }
+    } catch (err) {
+      console.error("❌ Error autofilling client:", err);
+    }
+  };  
+
+  const [clientSuggestions, setClientSuggestions] = useState([]);
+
+  const handleClientEmailChange = async (value) => {
+    if (!value) return setClientSuggestions([]);
+  
+    try {
+      const res = await fetch(`https://vt-quotation.onrender.com/clients/search?query=${value}`);
+      const data = await res.json();
+      setClientSuggestions(data);
+    } catch (err) {
+      console.error("❌ Error fetching client suggestions:", err);
+    }
+  };
+
+  const handleSelectClient = (client) => {
+    setValue("clientEmail", client.email);
+    setValue("clientName", client.name);
+    setValue("clientAddress", client.address);
+    setValue("clientContact", client.contact);
+    setValue("clientGSTIN", client.gstin);
+    setClientSuggestions([]); // hide dropdown
+  };
+  
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
@@ -217,7 +281,28 @@ const BRbioForm = () => {
             <input {...register("clientName")} placeholder="Client Name" required className="w-full p-2 border rounded text-sm" />
             <input {...register("clientAddress")} placeholder="Client Address" required className="w-full p-2 border rounded text-sm" />
             <input type="number" {...register("clientContact")} placeholder="Client Contact" required className="w-full p-2 border rounded text-sm" />
-            <input type="email" {...register("clientEmail")} placeholder="Client Email" required className="w-full p-2 border rounded text-sm" />
+            <input
+    type="email"
+    {...register("clientEmail")}
+    placeholder="Client Email"
+    required
+    className="w-full p-2 border rounded text-sm"
+    onChange={(e) => handleClientEmailChange(e.target.value)}
+  />
+
+  {clientSuggestions.length > 0 && (
+    <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
+      {clientSuggestions.map((client, i) => (
+        <li
+          key={i}
+          className="p-2 cursor-pointer hover:bg-gray-100"
+          onClick={() => handleSelectClient(client)}
+        >
+          {client.email} — {client.name}
+        </li>
+      ))}
+    </ul>
+  )}
             <input {...register("clientGSTIN")} placeholder="Client GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>

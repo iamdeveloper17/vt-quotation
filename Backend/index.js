@@ -11,6 +11,7 @@ const { InvoiceModel, Counter } = require("./models/Invoice");
 const adminOnly = require("./middleware/adminOnly");
 const PurchaseOrderModel = require("./models/PurchaseOrder");
 const Item = require("./models/Item");
+const Client = require("./models/Client");
 
 // const JWT_SECRET = "your_secret_key"; // Replace with a strong secret key
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
@@ -423,39 +424,6 @@ app.put("/admin/users/:id/permissions", adminOnly, async (req, res) => {
   }
 });
 
-
-// CREATE Purchase Order
-// app.post("/purchase-orders", async (req, res) => {
-//   try {
-//     const { purchaseNumber, userEmail, ...rest } = req.body;
-
-//     if (!userEmail) {
-//       return res.status(400).json({ message: "User email is required" });
-//     }
-
-//     // ✅ Check if order with same purchaseNumber and user already exists
-//     const existingOrder = await PurchaseOrderModel.findOne({ purchaseNumber});
-
-//     if (existingOrder) {
-//       // ✅ Update instead of duplicate
-//       const updatedOrder = await PurchaseOrderModel.findOneAndUpdate(
-//         { purchaseNumber},
-//         { purchaseNumber, userEmail, ...rest },
-//         { new: true }
-//       );
-//       return res.status(200).json({ message: "Purchase order updated", id: updatedOrder._id });
-//     }
-
-//     // ✅ Otherwise, create new
-//     const newOrder = new PurchaseOrderModel({ purchaseNumber, userEmail, ...rest });
-//     await newOrder.save();
-//     res.status(201).json({ message: "Purchase order saved", id: newOrder._id });
-
-//   } catch (error) {
-//     console.error("Error saving purchase order:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });
 app.post("/purchase-orders", async (req, res) => {
   try {
     const { _id, userEmail, ...rest } = req.body;
@@ -592,17 +560,6 @@ app.delete("/items/:id", async (req, res) => {
   }
 });
 
-// app.put("/admin/users/:id/password", adminOnly, async (req, res) => {
-//   const { password } = req.body;
-//   if (!password || password.length < 6) {
-//     return res.status(400).json({ message: "Password must be at least 6 characters" });
-//   }
-
-//   const hashedPassword = await bcrypt.hash(password, 10);
-//   await EmployeeModel.findByIdAndUpdate(req.params.id, { password: hashedPassword });
-//   res.json({ message: "Password updated" });
-// });
-
 app.put("/admin/users/:id/password", adminOnly, async (req, res) => {
   const { password } = req.body;
   if (!password || password.length < 6) {
@@ -661,6 +618,57 @@ app.put("/admin/users/:id", adminOnly, async (req, res) => {
 });
 
 
+// Save/update client
+app.post("/clients", async (req, res) => {
+  const { name, address, contact, email, gstin } = req.body;
+  try {
+    const existing = await Client.findOne({ email });
+    if (existing) {
+      await Client.updateOne({ email }, { name, address, contact, gstin });
+      return res.json({ message: "Client updated" });
+    }
+    const newClient = new Client({ name, address, contact, email, gstin });
+    await newClient.save();
+    res.status(201).json({ message: "Client saved" });
+  } catch (err) {
+    console.error("Error saving client:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+// Get client by email
+app.get("/clients", async (req, res) => {
+  const { email } = req.query;
+  try {
+    const client = await Client.findOne({ email });
+    if (client) {
+      res.json(client);
+    } else {
+      res.status(404).json({ message: "Client not found" });
+    }
+  } catch (err) {
+    console.error("Error finding client:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/clients/search", async (req, res) => {
+  const { query } = req.query;
+  try {
+    const clients = await Client.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { email: { $regex: query, $options: "i" } },
+      ],
+    }).limit(5); // return max 5 results
+    res.json(clients);
+  } catch (error) {
+    console.error("Error searching clients:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 const port = process.env.PORT;
 
