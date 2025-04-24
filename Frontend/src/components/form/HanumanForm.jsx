@@ -68,31 +68,24 @@ const HanumanForm = () => {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) return alert("User not logged in. Please log in again.");
 
-    // ✅ Clean empty items (optional, but good UX)
     const nonEmptyItems = data.items.filter(item => item.description && item.quantity && item.price);
 
-    // ✅ Calculate gstAmount and totalAmount
     const calculatedItems = nonEmptyItems.map((item) => {
       const quantity = Number(item.quantity) || 0;
       const price = Number(item.price) || 0;
       const gst = Number(item.gst) || 0;
-
       const gstAmount = (quantity * price * gst) / 100;
       const totalAmount = quantity * price + gstAmount;
-
       return { ...item, gstAmount, totalAmount };
     });
 
-    // ✅ Save unique suggestions for autocomplete
     const newSuggestions = calculatedItems.map(({ description, hsn, price, gst, model }) => ({
       description, hsn, price, gst, model
     }));
-
     const stored = JSON.parse(localStorage.getItem("savedItems")) || [];
     const updatedSuggestions = [...new Map([...stored, ...newSuggestions].map(i => [i.description, i])).values()];
     localStorage.setItem("savedItems", JSON.stringify(updatedSuggestions));
 
-    // ✅ Totals
     const subTotal = calculatedItems.reduce((acc, item) => acc + (item.quantity * item.price), 0);
     const totalGST = calculatedItems.reduce((acc, item) => acc + item.gstAmount, 0);
     const grandTotal = subTotal + totalGST;
@@ -119,7 +112,26 @@ const HanumanForm = () => {
       );
 
       if (response.ok) {
-        // ✅ Save new items to backend Item collection
+        const clientRes = await fetch("https://vt-quotation.onrender.com/clients", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: data.clientName,
+            address: data.clientAddress,
+            contact: data.clientContact,
+            email: data.clientEmail,
+            gstin: data.clientGSTIN,
+          }),
+        });
+
+        if (clientRes.ok) {
+          const clientResult = await clientRes.json();
+          console.log("✅ Client Save Response:", clientResult);
+        } else {
+          const errorText = await clientRes.text();
+          console.error("❌ Client save failed. Response:", errorText);
+        }
+
         if (!editData) {
           for (const item of calculatedItems) {
             try {
@@ -152,7 +164,6 @@ const HanumanForm = () => {
     }
   };
 
-
   const addItem = () => {
     append({
       description: "",
@@ -168,6 +179,7 @@ const HanumanForm = () => {
 
   const [savedItems, setSavedItems] = useState([]);
   const [suggestions, setSuggestions] = useState({});
+  const [clientSuggestions, setClientSuggestions] = useState([]);
 
   useEffect(() => {
     const storedItems = JSON.parse(localStorage.getItem("savedItems")) || [];
@@ -187,23 +199,39 @@ const HanumanForm = () => {
 
   const handleSelectSuggestion = (index, item) => {
     setValue(`items.${index}.description`, item.description);
-    setValue(`items.${index}.model`, item.model); // ✅ Add this line
+    setValue(`items.${index}.model`, item.model);
     setValue(`items.${index}.hsn`, item.hsn);
     setValue(`items.${index}.price`, item.price);
     setValue(`items.${index}.gst`, item.gst);
     setSuggestions((prev) => ({ ...prev, [index]: [] }));
   };
 
+  const handleClientEmailChange = async (value) => {
+    if (!value) return setClientSuggestions([]);
+    try {
+      const res = await fetch(`https://vt-quotation.onrender.com/clients/search?query=${value}`);
+      const data = await res.json();
+      setClientSuggestions(data);
+    } catch (err) {
+      console.error("❌ Error fetching client suggestions:", err);
+    }
+  };
+
+  const handleSelectClient = (client) => {
+    setValue("clientEmail", client.email);
+    setValue("clientName", client.name);
+    setValue("clientAddress", client.address);
+    setValue("clientContact", client.contact);
+    setValue("clientGSTIN", client.gstin);
+    setClientSuggestions([]);
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center text-blue-500 uppercase">
         {editData ? "Edit Quotation" : "Create Quotation"}
       </h2>
-
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
-        {/* Company & Client Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-3">
             <input {...register("companyName")} placeholder="Company Name" required className="w-full p-2 border rounded text-sm" />
@@ -212,11 +240,31 @@ const HanumanForm = () => {
             <input type="email" {...register("companyEmail")} placeholder="Company Email" required className="w-full p-2 border rounded text-sm" />
             <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
-          <div className="space-y-3">
+          <div className="space-y-3 relative">
             <input {...register("clientName")} placeholder="Client Name" required className="w-full p-2 border rounded text-sm" />
             <input {...register("clientAddress")} placeholder="Client Address" required className="w-full p-2 border rounded text-sm" />
             <input type="number" {...register("clientContact")} placeholder="Client Contact" required className="w-full p-2 border rounded text-sm" />
-            <input type="email" {...register("clientEmail")} placeholder="Client Email" required className="w-full p-2 border rounded text-sm" />
+            <input
+              type="email"
+              {...register("clientEmail")}
+              placeholder="Client Email"
+              required
+              onChange={(e) => handleClientEmailChange(e.target.value)}
+              className="w-full p-2 border rounded text-sm"
+            />
+            {clientSuggestions.length > 0 && (
+              <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
+                {clientSuggestions.map((client, i) => (
+                  <li
+                    key={i}
+                    className="p-2 cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSelectClient(client)}
+                  >
+                    {client.email} — {client.name}
+                  </li>
+                ))}
+              </ul>
+            )}
             <input {...register("clientGSTIN")} placeholder="Client GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>
