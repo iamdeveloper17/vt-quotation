@@ -592,30 +592,73 @@ app.delete("/items/:id", async (req, res) => {
   }
 });
 
+// app.put("/admin/users/:id/password", adminOnly, async (req, res) => {
+//   const { password } = req.body;
+//   if (!password || password.length < 6) {
+//     return res.status(400).json({ message: "Password must be at least 6 characters" });
+//   }
+
+//   const hashedPassword = await bcrypt.hash(password, 10);
+//   await EmployeeModel.findByIdAndUpdate(req.params.id, { password: hashedPassword });
+//   res.json({ message: "Password updated" });
+// });
+
 app.put("/admin/users/:id/password", adminOnly, async (req, res) => {
   const { password } = req.body;
   if (!password || password.length < 6) {
     return res.status(400).json({ message: "Password must be at least 6 characters" });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-  await EmployeeModel.findByIdAndUpdate(req.params.id, { password: hashedPassword });
+  await EmployeeModel.findByIdAndUpdate(req.params.id, { password });
   res.json({ message: "Password updated" });
 });
 
+
 // Update user info
+// app.put("/admin/users/:id", adminOnly, async (req, res) => {
+//   const { name, email, password, role } = req.body;
+
+//   const update = { name, email, role };
+
+//   // ❌ Remove hashing if not needed
+//   if (password && password.length >= 6) {
+//     update.password = password; // 🛑 Plain text save — only for dev/testing!
+//   }
+
+//   try {
+//     const updatedUser = await EmployeeModel.findByIdAndUpdate(req.params.id, update, { new: true });
+
+//     if (!updatedUser) return res.status(404).json({ message: "User not found" });
+
+//     res.json({ message: "User updated", user: updatedUser });
+//   } catch (err) {
+//     console.error("Error updating user:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
+
 app.put("/admin/users/:id", adminOnly, async (req, res) => {
   const { name, email, password, role } = req.body;
 
   const update = { name, email, role };
+
   if (password && password.length >= 6) {
-    update.password = await bcrypt.hash(password, 10);
+    update.password = password;
   }
 
-  const updatedUser = await EmployeeModel.findByIdAndUpdate(req.params.id, update, { new: true });
-  res.json({ user: updatedUser });
-});
+  console.log("🧪 Final user update object:", update); // <--- ADD THIS LINE
 
+  try {
+    const updatedUser = await EmployeeModel.findByIdAndUpdate(req.params.id, update, { new: true });
+
+    if (!updatedUser) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User updated", user: updatedUser });
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 

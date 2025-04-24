@@ -5,12 +5,12 @@ import { useNavigate } from "react-router-dom";
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const navigate = useNavigate()
-  
+
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
-          // 🔍 Log the token before making the request
-      console.log("Stored token:", localStorage.getItem("token"));
+        // 🔍 Log the token before making the request
+        console.log("Stored token:", localStorage.getItem("token"));
 
         const res = await axios.get("https://vt-quotation.onrender.com/admin/users", {
           headers: {
@@ -78,7 +78,7 @@ const AdminUsers = () => {
       alert("❌ Could not delete user");
     }
   };
-  
+
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
@@ -142,12 +142,12 @@ const AdminUsers = () => {
                     </div>
                   </td>
                   <td className="p-2 border border-gray-300 whitespace-nowrap">
-                  <button
-  onClick={() => navigate('/adminusers/signup', { state: { userToEdit: user } })}
-  className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
->
-  Edit User
-</button>
+                    <button
+                      onClick={() => navigate('/adminusers/signup', { state: { userToEdit: user } })}
+                      className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 mr-2"
+                    >
+                      Edit
+                    </button>
 
                     <button
                       onClick={() => handleDelete(user._id)}
