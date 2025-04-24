@@ -27,7 +27,8 @@ const EmployeeSchema = new mongoose.Schema({
   password: String,
   role: {
     type: String,
-    default: "user", // user or admin
+    enum: ['admin', 'manager', 'tender', 'accounts'], 
+    // default: "user", // user or admin
   },
   canCreateQuotation: {
     type: Boolean,

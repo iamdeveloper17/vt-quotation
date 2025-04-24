@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
-
+  const navigate = useNavigate()
+  
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
+          // 🔍 Log the token before making the request
+      console.log("Stored token:", localStorage.getItem("token"));
+
         const res = await axios.get("https://vt-quotation.onrender.com/admin/users", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -73,12 +78,20 @@ const AdminUsers = () => {
       alert("❌ Could not delete user");
     }
   };
+  
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-2xl font-bold mb-4 uppercase text-center text-[#343148FF]">
         Users List
       </h2>
+
+      <button
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        onClick={() => navigate('/adminusers/signup')}
+      >
+        Create New User
+      </button>
 
       {/* ✅ DESKTOP TABLE VIEW */}
       <div className="hidden md:block mt-4 h-[500px] overflow-y-auto shadow-xl border border-gray-300 rounded-lg">
@@ -129,6 +142,13 @@ const AdminUsers = () => {
                     </div>
                   </td>
                   <td className="p-2 border border-gray-300 whitespace-nowrap">
+                  <button
+  onClick={() => navigate('/adminusers/signup', { state: { userToEdit: user } })}
+  className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+>
+  Edit User
+</button>
+
                     <button
                       onClick={() => handleDelete(user._id)}
                       className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"

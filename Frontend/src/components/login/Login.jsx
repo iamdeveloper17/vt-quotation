@@ -24,12 +24,6 @@ const Login = () => {
           {/* Buttons */}
           <div className="mt-6 justify-center flex md:flex-row items-center md:items-start gap-4 md:justify-start">
             <button
-              onClick={() => navigate('/signup')}
-              className="bg-[#644e24] px-6 py-2 rounded-lg text-white text-sm shadow-md transition-all duration-300 hover:bg-[#443925]"
-            >
-              Sign up
-            </button>
-            <button
               onClick={() => navigate('/login')}
               className="bg-[#644e24] px-6 py-2 rounded-lg text-white text-sm shadow-md transition-all duration-300 hover:bg-[#443925]"
             >

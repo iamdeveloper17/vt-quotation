@@ -592,6 +592,33 @@ app.delete("/items/:id", async (req, res) => {
   }
 });
 
+app.put("/admin/users/:id/password", adminOnly, async (req, res) => {
+  const { password } = req.body;
+  if (!password || password.length < 6) {
+    return res.status(400).json({ message: "Password must be at least 6 characters" });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await EmployeeModel.findByIdAndUpdate(req.params.id, { password: hashedPassword });
+  res.json({ message: "Password updated" });
+});
+
+// Update user info
+app.put("/admin/users/:id", adminOnly, async (req, res) => {
+  const { name, email, password, role } = req.body;
+
+  const update = { name, email, role };
+  if (password && password.length >= 6) {
+    update.password = await bcrypt.hash(password, 10);
+  }
+
+  const updatedUser = await EmployeeModel.findByIdAndUpdate(req.params.id, update, { new: true });
+  res.json({ user: updatedUser });
+});
+
+
+
+
 const port = process.env.PORT;
 
 app.listen(port, () => {

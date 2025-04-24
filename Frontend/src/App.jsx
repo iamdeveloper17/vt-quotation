@@ -36,7 +36,6 @@ const App = () => {
       <Router>
         <Routes>
           <Route path='/' element={<PublicRoute><Login /></PublicRoute>} />
-          <Route path='/signup' element={<PublicRoute><Signup /></PublicRoute>} />
           <Route path='/login' element={<PublicRoute><LoginFirst /></PublicRoute>} />
           <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} >
             <Route path="dashboard" element={<DashBoard />} />
@@ -45,6 +44,7 @@ const App = () => {
             <Route path="purchase_order" element={<PurchaseOrder />} />
             <Route path="admin_items" element={<AdminItems />} />
           </Route>
+          <Route path='/adminusers/signup' element={<PrivateRoute><Signup /></PrivateRoute>} />
           <Route path='/quotation/br' element={<PrivateRoute><BRbioForm /></PrivateRoute>} />
           <Route path='/brbiopage' element={<PrivateRoute><BRbioPage /></PrivateRoute>} />
           <Route path='/quotation/hanuman' element={<PrivateRoute><HanumanForm /></PrivateRoute>} />
