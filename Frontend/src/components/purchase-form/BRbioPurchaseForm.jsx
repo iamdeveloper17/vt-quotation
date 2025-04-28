@@ -156,20 +156,35 @@ const BRbioPurchaseForm = () => {
       
           if (response.ok) {
             if (!editData) {
-              for (const item of updatedItems) {
-                await fetch("https://vt-quotation.onrender.com/items", {
+                // Save each item
+                for (const item of updatedItems) {
+                  await fetch("https://vt-quotation.onrender.com/items", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      description: item.description,
+                      model: item.model,
+                      hsn: item.hsn,
+                      price: item.price,
+                      gst: item.gst,
+                    }),
+                  });
+                }
+              
+                // Save or Update Sales Manager
+                await fetch("https://vt-quotation.onrender.com/salesmanagers", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
-                    description: item.description,
-                    model: item.model,
-                    hsn: item.hsn,
-                    price: item.price,
-                    gst: item.gst,
+                    name: data.SalesManagerName,
+                    address: data.Address,
+                    contact: data.Contact,
+                    email: data.Email,
+                    gstin: data.GSTIN,
                   }),
                 });
               }
-            }
+              
       
             const savedData = await response.json();
             alert(editData ? "Purchase Order updated!" : "Purchase Order saved!");
