@@ -12,6 +12,7 @@ const adminOnly = require("./middleware/adminOnly");
 const PurchaseOrderModel = require("./models/PurchaseOrder");
 const Item = require("./models/Item");
 const Client = require("./models/Client");
+const SalesManager = require("./models/SalesManager"); 
 
 // const JWT_SECRET = "your_secret_key"; // Replace with a strong secret key
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
@@ -426,28 +427,125 @@ app.put("/admin/users/:id/permissions", adminOnly, async (req, res) => {
 
 app.post("/purchase-orders", async (req, res) => {
   try {
-    const { _id, userEmail, ...rest } = req.body;
+    const {
+      purchaseNumber,
+      date,
+      orderAgainst,
+      deliveryPeriod,
+      placeInstallation,
+      companyName,
+      companyAddress,
+      companyContact,
+      companyEmail,
+      companyGSTIN,
+      SalesManagerName,
+      Address,
+      Contact,
+      Email,
+      GSTIN,
+      items,
+      terms,
+      subTotal,
+      totalGST,
+      grandTotal,
+      userEmail,
+    } = req.body;
 
     if (!userEmail) {
       return res.status(400).json({ message: "User email is required" });
     }
 
-    if (_id) {
-      // ✅ If _id exists, it's an update
-      const updatedOrder = await PurchaseOrderModel.findByIdAndUpdate(_id, { userEmail, ...rest }, { new: true });
-      return res.status(200).json({ message: "Purchase order updated", id: updatedOrder._id });
-    }
+    const newOrder = new PurchaseOrderModel({
+      purchaseNumber,
+      date,
+      orderAgainst,
+      deliveryPeriod,
+      placeInstallation,
+      companyName,
+      companyAddress,
+      companyContact,
+      companyEmail,
+      companyGSTIN,
+      SalesManagerName,
+      Address,
+      Contact,
+      Email,
+      GSTIN,
+      items,
+      terms,
+      subTotal,
+      totalGST,
+      grandTotal,
+      userEmail,
+    });
 
-    // ✅ If no _id, it's a new entry
-    const newOrder = new PurchaseOrderModel({ userEmail, ...rest });
     await newOrder.save();
     res.status(201).json({ message: "Purchase order saved", id: newOrder._id });
-
   } catch (error) {
     console.error("Error saving purchase order:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
+// UPDATE Purchase Order
+
+app.put("/purchase-orders/:id", async (req, res) => {
+  try {
+    const {
+      purchaseNumber,
+      date,
+      orderAgainst,
+      deliveryPeriod,
+      placeInstallation,
+      companyName,
+      companyAddress,
+      companyContact,
+      companyEmail,
+      companyGSTIN,
+      SalesManagerName,
+      Address,
+      Contact,
+      Email,
+      GSTIN,
+      items,
+      terms,
+      subTotal,
+      totalGST,
+      grandTotal,
+      userEmail,
+    } = req.body;
+
+    const updated = await PurchaseOrderModel.findByIdAndUpdate(req.params.id, {
+      purchaseNumber,
+      date,
+      orderAgainst,
+      deliveryPeriod,
+      placeInstallation,
+      companyName,
+      companyAddress,
+      companyContact,
+      companyEmail,
+      companyGSTIN,
+      SalesManagerName,
+      Address,
+      Contact,
+      Email,
+      GSTIN,
+      items,
+      terms,
+      subTotal,
+      totalGST,
+      grandTotal,
+      userEmail,
+    }, { new: true });
+
+    if (!updated) return res.status(404).json({ message: "Not found" });
+    res.json({ message: "Purchase order updated", updated });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 
 // GET All Purchase Orders
@@ -468,17 +566,6 @@ app.get("/purchase-orders/:id", async (req, res) => {
     const order = await PurchaseOrderModel.findById(req.params.id);
     if (!order) return res.status(404).json({ message: "Not found" });
     res.json(order);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// UPDATE Purchase Order
-app.put("/purchase-orders/:id", async (req, res) => {
-  try {
-    const updated = await PurchaseOrderModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated) return res.status(404).json({ message: "Not found" });
-    res.json({ message: "Purchase order updated", updated });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
@@ -572,27 +659,6 @@ app.put("/admin/users/:id/password", adminOnly, async (req, res) => {
 
 
 // Update user info
-// app.put("/admin/users/:id", adminOnly, async (req, res) => {
-//   const { name, email, password, role } = req.body;
-
-//   const update = { name, email, role };
-
-//   // ❌ Remove hashing if not needed
-//   if (password && password.length >= 6) {
-//     update.password = password; // 🛑 Plain text save — only for dev/testing!
-//   }
-
-//   try {
-//     const updatedUser = await EmployeeModel.findByIdAndUpdate(req.params.id, update, { new: true });
-
-//     if (!updatedUser) return res.status(404).json({ message: "User not found" });
-
-//     res.json({ message: "User updated", user: updatedUser });
-//   } catch (err) {
-//     console.error("Error updating user:", err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });
 
 app.put("/admin/users/:id", adminOnly, async (req, res) => {
   const { name, email, password, role } = req.body;
@@ -669,6 +735,76 @@ app.get("/clients/search", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+// controllers/salesManagerController.js
+
+// Create a Sales Manager
+const createSalesManager = async (req, res) => {
+  try {
+    const newManager = new SalesManager(req.body);
+    await newManager.save();
+    res.status(201).json(newManager);
+  } catch (error) {
+    console.error("Error creating Sales Manager:", error);
+    res.status(500).json({ message: "Failed to create Sales Manager" });
+  }
+};
+
+// Search Sales Managers
+const searchSalesManagers = async (req, res) => {
+  try {
+    const { query } = req.query;
+    const managers = await SalesManager.find({
+      name: { $regex: query, $options: "i" }, // case insensitive
+    }).limit(10);
+
+    res.status(200).json(managers);
+  } catch (error) {
+    console.error("Error searching Sales Managers:", error);
+    res.status(500).json({ message: "Failed to search Sales Managers" });
+  }
+};
+
+module.exports = {
+  createSalesManager,
+  searchSalesManagers,
+};
+
+// Save or Update Sales Manager
+app.post("/salesmanagers", async (req, res) => {
+  const { name, address, contact, email, gstin } = req.body;
+  try {
+    const existing = await SalesManager.findOne({ email });
+    if (existing) {
+      await SalesManager.updateOne({ email }, { name, address, contact, gstin });
+      return res.json({ message: "Sales Manager updated" });
+    }
+    const newManager = new SalesManager({ name, address, contact, email, gstin });
+    await newManager.save();
+    res.status(201).json({ message: "Sales Manager saved" });
+  } catch (err) {
+    console.error("Error saving Sales Manager:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Search Sales Managers
+app.get("/salesmanagers/search", async (req, res) => {
+  const { query } = req.query;
+  try {
+    const managers = await SalesManager.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { email: { $regex: query, $options: "i" } },
+      ],
+    }).limit(5);
+    res.json(managers);
+  } catch (error) {
+    console.error("Error searching Sales Managers:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 const port = process.env.PORT;
 

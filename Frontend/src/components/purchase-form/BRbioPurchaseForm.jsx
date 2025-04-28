@@ -17,11 +17,11 @@ const BRbioPurchaseForm = () => {
             quotationNumber: "",
             date: "",
             validUntil: "",
-            clientName: "",
-            clientAddress: "",
-            clientContact: "",
-            clientEmail: "",
-            clientGSTIN: "",
+            SalesManagerName: "",
+            Address: "",
+            Contact: "",
+            Email: "",
+            GSTIN: "",
             items: [
                 {
                     description: "",
@@ -99,7 +99,7 @@ const BRbioPurchaseForm = () => {
             console.error("Error fetching quotation number:", error);
         }
     };
-
+ 
     const onSubmit = async (data) => {
         const userEmail = localStorage.getItem("userEmail");
         if (!userEmail) return alert("User not logged in. Please log in again.");
@@ -115,12 +115,29 @@ const BRbioPurchaseForm = () => {
         const grandTotal = subTotal + totalGST;
       
         const updatedData = {
-          ...data,
-          userEmail,
+          purchaseNumber: data.purchaseNumber,
+          date: data.date,
+          orderAgainst: data.orderAgainst,
+          deliveryPeriod: data.deliveryPeriod,
+          placeInstallation: data.placeInstallation,
+          companyName: data.companyName,
+          companyAddress: data.companyAddress,
+          companyContact: data.companyContact,
+          companyEmail: data.companyEmail,
+          companyGSTIN: data.companyGSTIN,
+      
+          SalesManagerName: data.SalesManagerName, // ✅ Correct
+          Address: data.Address,                   // ✅ Correct
+          Contact: data.Contact,                   // ✅ Correct
+          Email: data.Email,                       // ✅ Correct
+          GSTIN: data.GSTIN,                       // ✅ Correct
+      
           items: updatedItems,
+          terms: data.terms,
           subTotal,
           totalGST,
           grandTotal,
+          userEmail,
         };
       
         try {
@@ -137,7 +154,6 @@ const BRbioPurchaseForm = () => {
           });
       
           if (response.ok) {
-            // Save items if new purchase order only
             if (!editData) {
               for (const item of updatedItems) {
                 await fetch("https://vt-quotation.onrender.com/items", {
@@ -155,8 +171,8 @@ const BRbioPurchaseForm = () => {
             }
       
             const savedData = await response.json();
-      
             alert(editData ? "Purchase Order updated!" : "Purchase Order saved!");
+      
             localStorage.setItem("lastInvoice", JSON.stringify({
               ...updatedData,
               _id: editData?._id || savedData.id
@@ -171,6 +187,7 @@ const BRbioPurchaseForm = () => {
           alert("Error connecting to server");
         }
       };
+
       
     const addItem = () => {
         append({
@@ -237,11 +254,11 @@ const BRbioPurchaseForm = () => {
                         <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
                     </div>
                     <div className="space-y-3">
-                        <input {...register("clientName")} placeholder="Sales Manager Name" required className="w-full p-2 border rounded text-sm" />
-                        <input {...register("clientAddress")} placeholder="Address" required className="w-full p-2 border rounded text-sm" />
-                        <input type="number" {...register("clientContact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
-                        <input type="email" {...register("clientEmail")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
-                        <input {...register("clientGSTIN")} placeholder="GSTIN" required className="w-full p-2 border rounded text-sm" />
+                        <input {...register("SalesManagerName")} placeholder="Sales Manager Name" required className="w-full p-2 border rounded text-sm" />
+                        <input {...register("Address")} placeholder="Address" required className="w-full p-2 border rounded text-sm" />
+                        <input type="number" {...register("Contact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
+                        <input type="email" {...register("Email")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
+                        <input {...register("GSTIN")} placeholder="GSTIN" required className="w-full p-2 border rounded text-sm" />
                     </div>
                 </div>
 

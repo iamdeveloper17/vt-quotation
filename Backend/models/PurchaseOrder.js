@@ -25,11 +25,11 @@ const PurchaseOrderSchema = new mongoose.Schema({
   companyEmail: String,
   companyGSTIN: String,
 
-  clientName: String,
-  clientAddress: String,
-  clientContact: String,
-  clientEmail: String,
-  clientGSTIN: String,
+  SalesManagerName: String,
+  Address: String,
+  Contact: Number,
+  Email: String,
+  GSTIN: String,
 
   items: [PurchaseSchema],
   terms: String,
