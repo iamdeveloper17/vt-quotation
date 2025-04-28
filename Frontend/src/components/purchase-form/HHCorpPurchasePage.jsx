@@ -169,11 +169,11 @@ const HHCorpPurchasePage = () => {
             <td colSpan={9}>
               <div>
                 <div className="text-xs text-zinc-700 md:text-sm">
-                  <p className="text-sm font-bold mb-1 md:text-base">Mr. {formData.clientName}</p>
-                  <p><span className="font-bold">Address :</span> {formData.clientAddress}</p>
-                  <p><span className="font-bold">Contact no. :</span> {formData.clientContact}</p>
-                  <p><span className="font-bold">Email :</span> {formData.clientEmail}</p>
-                  <p><span className="font-bold">GSTIN :</span> {formData.clientGSTIN}</p>
+                  <p className="text-sm font-bold mb-1 md:text-base">Mr. {formData.SalesManagerName}</p>
+                  <p><span className="font-bold">Address :</span> {formData.Address}</p>
+                  <p><span className="font-bold">Contact no. :</span> {formData.Contact}</p>
+                  <p><span className="font-bold">Email :</span> {formData.Email}</p>
+                  <p><span className="font-bold">GSTIN :</span> {formData.GSTIN}</p>
                 </div>
               </div>
               {/* </div> */}
@@ -183,7 +183,7 @@ const HHCorpPurchasePage = () => {
             <td colSpan={9}>
               <div className="mt-4">
                 <h1 className="uppercase font-bold text-center mb-2 text-blue-500 text-sm md:text-lg">Purchase Order no. {formData.purchaseNumber}</h1>
-                <p className="text-sm md:text-base">Dear <span className="font-bold">Mr. {formData.clientName}</span>,	</p>
+                <p className="text-sm md:text-base">Dear <span className="font-bold">Mr. {formData.SalesManagerName}</span>,	</p>
                 <p className="text-xs md:text-sm mb-6">Please refer to our Conversation. We are pleased to confirm the purchase order with the following terms & conditions:
                 </p>
               </div>
