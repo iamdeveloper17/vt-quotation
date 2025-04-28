@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -188,13 +188,7 @@ const BRbioForm = () => {
     });
   };
 
-  const [savedItems, setSavedItems] = useState([]);
   const [suggestions, setSuggestions] = useState({});
-
-  useEffect(() => {
-    const storedItems = JSON.parse(localStorage.getItem("savedItems")) || [];
-    setSavedItems(storedItems);
-  }, []);
 
   const handleDescriptionChange = async (index, value) => {
     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
@@ -238,8 +232,16 @@ const BRbioForm = () => {
 
   const [clientSuggestions, setClientSuggestions] = useState([]);
 
-  const handleClientEmailChange = async (value) => {
-    if (!value) return setClientSuggestions([]);
+  const handleClientNameChange = async (value) => {
+    if (isSelectingRef.current) {
+      isSelectingRef.current = false;
+      return; // 🛑 Stop fetching if currently selecting
+    }
+
+    if (!value) {
+      setClientSuggestions([]);
+      return;
+    }
 
     try {
       const res = await fetch(`https://vt-quotation.onrender.com/clients/search?query=${value}`);
@@ -250,14 +252,35 @@ const BRbioForm = () => {
     }
   };
 
+  const isSelectingRef = useRef(false);
+
+  const clientNameRef = useRef(null);
+  const [isClientNameFocused, setIsClientNameFocused] = useState(false);
+
   const handleSelectClient = (client) => {
+    isSelectingRef.current = true; // 🛡 Mark selecting mode
     setValue("clientEmail", client.email);
     setValue("clientName", client.name);
     setValue("clientAddress", client.address);
     setValue("clientContact", client.contact);
     setValue("clientGSTIN", client.gstin);
-    setClientSuggestions([]); // hide dropdown
+    setClientSuggestions([]);
+    setIsClientNameFocused(false);
   };
+
+  const clientNameWrapperRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (clientNameWrapperRef.current && !clientNameWrapperRef.current.contains(event.target)) {
+        setIsClientNameFocused(false);
+        setClientSuggestions([]);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
 
 
   return (
@@ -277,8 +300,31 @@ const BRbioForm = () => {
             <input type="email" {...register("companyEmail")} placeholder="Company Email" required className="w-full p-2 border rounded text-sm" />
             <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
-          <div className="space-y-3">
-            <input {...register("clientName")} placeholder="Client Name" required className="w-full p-2 border rounded text-sm" />
+          <div className="space-y-3 relative w-full">
+            <div ref={clientNameWrapperRef} className="relative w-full">
+              <input
+                {...register("clientName")}
+                placeholder="Client Name"
+                required
+                className="w-full p-2 border rounded text-sm"
+                onChange={(e) => handleClientNameChange(e.target.value)}
+                onFocus={() => setIsClientNameFocused(true)}
+              />
+              {clientSuggestions.length > 0 && isClientNameFocused && (
+                <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
+                  {clientSuggestions.map((client, i) => (
+                    <li
+                      key={i}
+                      className="p-2 cursor-pointer hover:bg-blue-300"
+                      onClick={() => handleSelectClient(client)}
+                    >
+                      {client.name} — {client.email} — {client.contact}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
             <input {...register("clientAddress")} placeholder="Client Address" required className="w-full p-2 border rounded text-sm" />
             <input type="number" {...register("clientContact")} placeholder="Client Contact" required className="w-full p-2 border rounded text-sm" />
             <input
@@ -287,22 +333,8 @@ const BRbioForm = () => {
               placeholder="Client Email"
               required
               className="w-full p-2 border rounded text-sm"
-              onChange={(e) => handleClientEmailChange(e.target.value)}
             />
 
-            {clientSuggestions.length > 0 && (
-              <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
-                {clientSuggestions.map((client, i) => (
-                  <li
-                    key={i}
-                    className="p-2 cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSelectClient(client)}
-                  >
-                    {client.email} — {client.name}
-                  </li>
-                ))}
-              </ul>
-            )}
             <input {...register("clientGSTIN")} placeholder="Client GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>

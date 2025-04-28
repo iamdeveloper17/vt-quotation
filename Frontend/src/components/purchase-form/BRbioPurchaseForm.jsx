@@ -100,107 +100,6 @@ const BRbioPurchaseForm = () => {
         }
     };
 
-    // const onSubmit = async (data) => {
-    //     const userEmail = localStorage.getItem("userEmail");
-    //     if (!userEmail) return alert("User not logged in. Please log in again.");
-
-    //     const updatedItems = data.items.map((item) => {
-    //         const gstAmount = (item.quantity * item.price * item.gst) / 100;
-    //         const totalAmount = item.quantity * item.price + gstAmount;
-    //         return { ...item, gstAmount, totalAmount };
-    //     });
-
-    //     const subTotal = updatedItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
-    //     const totalGST = updatedItems.reduce((acc, item) => acc + item.gstAmount, 0);
-    //     const grandTotal = subTotal + totalGST;
-
-    //     const updatedData = {
-    //         ...data,
-    //         userEmail,
-    //         items: updatedItems,
-    //         subTotal,
-    //         totalGST,
-    //         grandTotal,
-    //     };
-
-    //     console.log("Data sent to backend:", updatedData);
-
-    //     console.log("purchaseNumber:", data.purchaseNumber);
-    //     console.log("orderAgainst:", data.orderAgainst);
-    //     console.log("deliveryPeriod:", data.deliveryPeriod);
-    //     console.log("placeInstallation:", data.placeInstallation);
-
-
-    //     // try {
-
-    //     //     const response = await fetch(
-    //     //         editData?._id
-    //     //           ? `https://vt-quotation.onrender.com/purchase-orders/${editData._id}`
-    //     //           : "https://vt-quotation.onrender.com/purchase-orders",
-    //     //         {
-    //     //           method: editData?._id ? "PUT" : "POST",
-    //     //           headers: { "Content-Type": "application/json" },
-    //     //           body: JSON.stringify(updatedData),
-    //     //         }
-    //     //       );
-              
-
-    //     //     if (response.ok) {
-    //     //         alert(editData ? "Quotation updated!" : "Quotation saved!");
-    //     //         localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
-    //     //         navigate("/brpurchasebiopage");
-    //     //     } else {
-    //     //         alert("Something went wrong");
-    //     //     }
-    //     // } catch (err) {
-    //     //     console.error("Submission error:", err);
-    //     //     alert("Error connecting to server");
-    //     // }
-
-    //     try {
-    //         const response = await fetch(
-    //           editData?._id
-    //             ? `https://vt-quotation.onrender.com/purchase-orders/${editData._id}`
-    //             : "https://vt-quotation.onrender.com/purchase-orders",
-    //           {
-    //             method: editData?._id ? "PUT" : "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify(updatedData),
-    //           }
-    //         );
-          
-    //         if (response.ok) {
-    //           // 👇 Add this part: Save each item to the Item collection (only if it's a new purchase, not edit)
-    //           if (!editData) {
-    //             for (const item of updatedItems) {
-    //               console.log("📦 Saving item to DB:", item.description); // ✅ Move inside the loop
-              
-    //               await fetch("https://vt-quotation.onrender.com/items", {
-    //                 method: "POST",
-    //                 headers: { "Content-Type": "application/json" },
-    //                 body: JSON.stringify({
-    //                   description: item.description,
-    //                   model: item.model,
-    //                   hsn: item.hsn,
-    //                   price: item.price,
-    //                   gst: item.gst
-    //                 }),
-    //               });
-    //             }
-    //           }              
-    //           alert(editData ? "Quotation updated!" : "Quotation saved!");
-    //           localStorage.setItem("lastInvoice", JSON.stringify(updatedData));
-    //           navigate("/brpurchasebiopage");
-    //         } else {
-    //           alert("Something went wrong");
-    //         }
-    //       } catch (err) {
-    //         console.error("Submission error:", err);
-    //         alert("Error connecting to server");
-    //       }
-          
-    // };
-
     const onSubmit = async (data) => {
         const userEmail = localStorage.getItem("userEmail");
         if (!userEmail) return alert("User not logged in. Please log in again.");
@@ -290,28 +189,12 @@ const BRbioPurchaseForm = () => {
     const [savedItems, setSavedItems] = useState([]);
     const [suggestions, setSuggestions] = useState({});
 
-    // useEffect(() => {
-    //     const storedItems = JSON.parse(localStorage.getItem("savedItems")) || [];
-    //     setSavedItems(storedItems);
-    // }, []);
-
     useEffect(() => {
         register("purchaseNumber");
         register("orderAgainst");
         register("deliveryPeriod");
         register("placeInstallation");
     }, [register]);
-
-
-    // const handleDescriptionChange = (index, value) => {
-    //     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
-
-    //     const matches = savedItems.filter((item) =>
-    //         item.description.toLowerCase().includes(value.toLowerCase())
-    //     );
-
-    //     setSuggestions((prev) => ({ ...prev, [index]: matches }));
-    // };
 
     const handleDescriptionChange = async (index, value) => {
         if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
