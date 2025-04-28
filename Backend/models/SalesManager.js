@@ -1,13 +1,13 @@
-// models/SalesManager.js
-
 const mongoose = require("mongoose");
 
 const SalesManagerSchema = new mongoose.Schema({
-  name: String,
-  address: String,
-  contact: String,
-  email: { type: String, unique: true },
-  gstin: String,
+  name: { type: String, required: true },
+  address: { type: String },
+  contact: { type: String },
+  email: { type: String },
+  gstin: { type: String },
 });
 
-module.exports = mongoose.model("SalesManager", SalesManagerSchema);
+const SalesManager = mongoose.model("SalesManager", SalesManagerSchema);
+
+module.exports = SalesManager;

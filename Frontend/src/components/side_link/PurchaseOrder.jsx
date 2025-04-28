@@ -159,7 +159,7 @@ const PurchaseOrder = () => {
             <tr>
               <th className="p-2 border border-gray-300">Purchase Order No</th>
               <th className="p-2 border border-gray-300">Company Name</th>
-              <th className="p-2 border border-gray-300">Client Name</th>
+              <th className="p-2 border border-gray-300">Sales Manager Name</th>
               <th className="p-2 border border-gray-300">Date</th>
               <th className="p-2 border border-gray-300">Subtotal</th>
               <th className="p-2 border border-gray-300">Total GST</th>
@@ -173,7 +173,7 @@ const PurchaseOrder = () => {
                 <tr key={invoice._id} className="text-center">
                   <td className="p-2 border border-gray-300">{invoice.purchaseNumber || "N/A"}</td>
                   <td className="p-2 border border-gray-300">{invoice.companyName || "N/A"}</td>
-                  <td className="p-2 border border-gray-300">{invoice.clientName || "N/A"}</td>
+                  <td className="p-2 border border-gray-300">{invoice.SalesManagerName || "N/A"}</td>
                   <td className="p-2 border border-gray-300">
                     {invoice.date ? new Date(invoice.date).toLocaleDateString() : "N/A"}
                   </td>

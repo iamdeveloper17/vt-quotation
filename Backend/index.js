@@ -12,7 +12,7 @@ const adminOnly = require("./middleware/adminOnly");
 const PurchaseOrderModel = require("./models/PurchaseOrder");
 const Item = require("./models/Item");
 const Client = require("./models/Client");
-const SalesManager = require("./models/SalesManager"); 
+const SalesManager = require("./models/SalesManager");
 
 // const JWT_SECRET = "your_secret_key"; // Replace with a strong secret key
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
@@ -739,36 +739,7 @@ app.get("/clients/search", async (req, res) => {
 // controllers/salesManagerController.js
 
 // Create a Sales Manager
-const createSalesManager = async (req, res) => {
-  try {
-    const newManager = new SalesManager(req.body);
-    await newManager.save();
-    res.status(201).json(newManager);
-  } catch (error) {
-    console.error("Error creating Sales Manager:", error);
-    res.status(500).json({ message: "Failed to create Sales Manager" });
-  }
-};
 
-// Search Sales Managers
-const searchSalesManagers = async (req, res) => {
-  try {
-    const { query } = req.query;
-    const managers = await SalesManager.find({
-      name: { $regex: query, $options: "i" }, // case insensitive
-    }).limit(10);
-
-    res.status(200).json(managers);
-  } catch (error) {
-    console.error("Error searching Sales Managers:", error);
-    res.status(500).json({ message: "Failed to search Sales Managers" });
-  }
-};
-
-module.exports = {
-  createSalesManager,
-  searchSalesManagers,
-};
 
 // Save or Update Sales Manager
 app.post("/salesmanagers", async (req, res) => {
@@ -797,13 +768,14 @@ app.get("/salesmanagers/search", async (req, res) => {
         { name: { $regex: query, $options: "i" } },
         { email: { $regex: query, $options: "i" } },
       ],
-    }).limit(5);
+    }).limit(5); // Return top 5 matches
     res.json(managers);
   } catch (error) {
     console.error("Error searching Sales Managers:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 const port = process.env.PORT;

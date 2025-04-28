@@ -6,6 +6,7 @@ const BRbioPurchaseForm = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const editData = location.state?.editData;
+    const [managerSuggestions, setManagerSuggestions] = useState([]);
 
     const { register, control, handleSubmit, setValue, watch, reset } = useForm({
         defaultValues: {
@@ -236,6 +237,29 @@ const BRbioPurchaseForm = () => {
         setSuggestions((prev) => ({ ...prev, [index]: [] }));
     };
 
+    const handleSalesManagerNameChange = async (value) => {
+        if (!value) {
+          setManagerSuggestions([]);
+          return;
+        }
+        try {
+          const res = await fetch(`https://vt-quotation.onrender.com/salesmanagers/search?query=${value}`);
+          const data = await res.json();
+          setManagerSuggestions(data);
+        } catch (err) {
+          console.error("Error fetching sales managers:", err);
+        }
+      };
+
+      const handleSelectManager = (manager) => {
+        setValue("SalesManagerName", manager.name);
+        setValue("Address", manager.address);
+        setValue("Contact", manager.contact);
+        setValue("Email", manager.email);
+        setValue("GSTIN", manager.gstin);
+        setManagerSuggestions([]);
+      };      
+
     return (
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center text-blue-500 uppercase">
@@ -254,7 +278,33 @@ const BRbioPurchaseForm = () => {
                         <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
                     </div>
                     <div className="space-y-3">
-                        <input {...register("SalesManagerName")} placeholder="Sales Manager Name" required className="w-full p-2 border rounded text-sm" />
+                    <div className="relative">
+  <input
+    {...register("SalesManagerName")}
+    placeholder="Sales Manager Name"
+    required
+    className="w-full p-2 border rounded text-sm"
+    onChange={(e) => {
+      setValue("SalesManagerName", e.target.value);
+      handleSalesManagerNameChange(e.target.value);
+    }}
+  />
+
+  {managerSuggestions.length > 0 && (
+    <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
+      {managerSuggestions.map((manager, i) => (
+        <li
+          key={i}
+          className="p-2 cursor-pointer hover:bg-gray-100"
+          onClick={() => handleSelectManager(manager)}
+        >
+          {manager.name} — {manager.email}
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
+
                         <input {...register("Address")} placeholder="Address" required className="w-full p-2 border rounded text-sm" />
                         <input type="number" {...register("Contact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
                         <input type="email" {...register("Email")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
