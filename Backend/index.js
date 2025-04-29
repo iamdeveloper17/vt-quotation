@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
 const bcrypt = require("bcrypt"); // To hash passwords
 const axios = require("axios"); // For email validation API
 const jwt = require("jsonwebtoken");
@@ -24,19 +23,26 @@ const { env } = require("process");
 
 const app = express();
 app.use(express.json());
+// const cors = require("cors");
+
+// app.use(cors());
+const cors = require("cors");
 
 const corsOptions = {
   origin: [
-    "https://vt-quotation-ux.vercel.app", 
-    "http://localhost:3000"
-  ], // 👈 allow both production and local development frontend
-  methods: "GET,POST,PUT,DELETE",
+    "http://localhost:5173",
+    "https://vt-quotation-ux.vercel.app"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
 
-// app.use(cors());
+// ✅ Important: handle preflight requests globally
+app.options("*", cors(corsOptions));
+
 
 const CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID"; // Replace with your Google Client ID
 const client = new OAuth2Client(CLIENT_ID);
@@ -138,6 +144,7 @@ app.post("/login", async (req, res) => {
       });
     }
     
+    console.log("Received login request:", email, password);
     
 
     // ✅ Then: Handle regular users from MongoDB

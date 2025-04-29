@@ -30,7 +30,11 @@ const LoginFirst = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("https://vt-quotation.onrender.com/login", data);
+      const response = await axios.post(
+        "https://vt-quotation.onrender.com/login",
+        data,
+        { withCredentials: true } // ✅ very important to match CORS credentials
+      );
 
       // ✅ Validate response
       if (!response.data?.token || !response.data?.user) {
@@ -49,7 +53,7 @@ const LoginFirst = () => {
       setApiError(error.response?.data?.message || "Invalid email or password");
     } finally {
       setIsLoading(false);
-    }
+    } 
   };
 
   return (

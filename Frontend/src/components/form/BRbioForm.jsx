@@ -428,7 +428,7 @@ const BRbioForm = () => {
                 <textarea
                   {...register(`items.${index}.feature`)}
                   placeholder="Feature details..."
-                  rows={2}
+                  rows={4}
                   className="col-span-full border p-2 rounded text-sm"
                 />
               )}
