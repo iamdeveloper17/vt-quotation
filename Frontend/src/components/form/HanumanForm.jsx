@@ -40,16 +40,33 @@ const HanumanForm = () => {
   });
 
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
-
   const [suggestions, setSuggestions] = useState({});
   const [clientSuggestions, setClientSuggestions] = useState([]);
   const [isClientNameFocused, setIsClientNameFocused] = useState(false);
   const isSelectingRef = useRef(false);
   const clientNameWrapperRef = useRef(null);
+  const [checkedTerms, setCheckedTerms] = useState([]);
+
+  const termsList = [
+    "PRICES: The prices are expressed in F.O.R Hospital basis in (INR)",
+    "GST & ANY OTHER LOCAL TAX: GST @ 12% shall be chargeable",
+    "PAYMENT: As per your terms & conditions.",
+    "Country OF ORIGIN: Singapore.",
+    "DELIVERY PERIOD: As per your terms & conditions",
+    "WARRANTY: Comprehensive Warranty for 3 Years as per tender terms & conditions",
+    "AMC/CMC AFTER WARRANTEE: AMC/CMC charge for next 7 years after expiry of warranty period of 3 years are mentioned in Price Schedule - Annexure - 2",
+    "INSTALLATION/DEMONSTRATION TRAINING: Shall be provided FOC at Users site by our Engineers.",
+    "PERFORMANCE BANK GURANTEE: Will be submitted after delivery and installation as per the terms of the tender.",
+    "VALIDITY OF OFFER: (200 days) from the date of opening of tender."
+  ];
 
   useEffect(() => {
     if (editData && editData.items) {
       reset({ ...editData, items: editData.items });
+
+      const existingTerms = editData.terms || "";
+      const matchedTerms = termsList.filter(term => existingTerms.includes(term));
+      setCheckedTerms(matchedTerms);
     } else {
       setValue("date", new Date().toISOString().split("T")[0]);
       setValue(
@@ -68,6 +85,24 @@ const HanumanForm = () => {
     } catch (err) {
       console.error("Error fetching quotation number:", err);
     }
+  };
+
+  const handleTermCheckboxChange = (isChecked, termText) => {
+    const currentTerms = watch("terms") || "";
+    let updatedTerms = currentTerms;
+
+    if (isChecked) {
+      if (!currentTerms.includes(termText)) {
+        updatedTerms = currentTerms.trim() + (currentTerms ? "\n" : "") + `• ${termText}`;
+      }
+      setCheckedTerms(prev => [...prev, termText]);
+    } else {
+      const regex = new RegExp(`• ${termText}\\n?`, "g");
+      updatedTerms = currentTerms.replace(regex, "").trim();
+      setCheckedTerms(prev => prev.filter(t => t !== termText));
+    }
+
+    setValue("terms", updatedTerms);
   };
 
   const onSubmit = async (data) => {
@@ -121,26 +156,6 @@ const HanumanForm = () => {
             gstin: data.clientGSTIN,
           }),
         });
-
-        if (!editData) {
-          for (const item of calculatedItems) {
-            try {
-              await fetch("https://vt-quotation.onrender.com/items", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  description: item.description,
-                  model: item.model,
-                  hsn: item.hsn,
-                  price: item.price,
-                  gst: item.gst,
-                }),
-              });
-            } catch (error) {
-              console.error("❌ Failed to save item:", item.description);
-            }
-          }
-        }
 
         alert(editData ? "Quotation updated!" : "Quotation saved!");
         localStorage.setItem("lastInvoice", JSON.stringify(finalData));
@@ -227,22 +242,23 @@ const HanumanForm = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
-      <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-blue-500 uppercase">
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center text-blue-500 uppercase">
         {editData ? "Edit Quotation" : "Create Quotation"}
       </h2>
 
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Company and Client Info */}
+
+        {/* Company & Client Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-3">
             <input {...register("companyName")} placeholder="Company Name" required className="w-full p-2 border rounded text-sm" />
             <input {...register("companyAddress")} placeholder="Company Address" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("companyContact")} type="number" placeholder="Company Contact" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("companyEmail")} type="email" placeholder="Company Email" required className="w-full p-2 border rounded text-sm" />
+            <input type="number" {...register("companyContact")} placeholder="Company Contact" required className="w-full p-2 border rounded text-sm" />
+            <input type="email" {...register("companyEmail")} placeholder="Company Email" required className="w-full p-2 border rounded text-sm" />
             <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
           <div className="space-y-3 relative w-full">
-            <div ref={clientNameWrapperRef}>
+            <div ref={clientNameWrapperRef} className="relative w-full">
               <input
                 {...register("clientName")}
                 placeholder="Client Name"
@@ -259,33 +275,68 @@ const HanumanForm = () => {
                       className="p-2 cursor-pointer hover:bg-blue-300"
                       onClick={() => handleSelectClient(client)}
                     >
-                      {client.name} — {client.email}
+                      {client.name} — {client.email} — {client.contact}
                     </li>
                   ))}
                 </ul>
               )}
             </div>
+
             <input {...register("clientAddress")} placeholder="Client Address" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientContact")} type="number" placeholder="Client Contact" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientEmail")} type="email" placeholder="Client Email" required className="w-full p-2 border rounded text-sm" />
+            <input type="number" {...register("clientContact")} placeholder="Client Contact" required className="w-full p-2 border rounded text-sm" />
+            <input
+              type="email"
+              {...register("clientEmail")}
+              placeholder="Client Email"
+              required
+              className="w-full p-2 border rounded text-sm"
+            />
+
             <input {...register("clientGSTIN")} placeholder="Client GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>
 
         {/* Date & Quotation */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div><input {...register("date")} type="date" required className="w-full p-2 border rounded text-sm" /></div>
-          <div><input {...register("validUntil")} type="date" required className="w-full p-2 border rounded text-sm" /></div>
-          <div><input {...register("quotationNumber")} type="text" value={watch("quotationNumber") || "Loading..."} readOnly className="w-full p-2 border rounded text-sm" /></div>
+          <div>
+            <label className="block font-semibold text-sm mb-1">Date</label>
+            <input {...register("date")} type="date" required className="w-full p-2 border rounded text-sm" />
+          </div>
+          <div>
+            <label className="block font-semibold text-sm mb-1">Valid Until</label>
+            <input {...register("validUntil")} type="date" required className="w-full p-2 border rounded text-sm" />
+          </div>
+          <div>
+            <label className="block font-semibold text-sm mb-1">Quotation Number</label>
+            <input
+              {...register("quotationNumber")}
+              type="text"
+              value={watch("quotationNumber") || "Loading..."}
+              readOnly
+              className="w-full p-2 border rounded text-sm"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+          <div>
+            <label className="block font-semibold text-sm mb-1">Subject</label>
+            <input {...register("subject")} type="text" required className="w-full p-2 border rounded text-sm" />
+          </div>
         </div>
 
         {/* Items */}
         <div>
           <h3 className="text-lg font-semibold mb-2">Items</h3>
+
           {fields.map((item, index) => (
-            <div key={item.id} className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-4 mb-4">
+            <div key={item.id} className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-4 mb-4 rounded-xl">
+
+              {/* Existing inputs like index, model, description, etc. */}
               <input value={index + 1} readOnly className="p-2 border rounded text-sm bg-gray-100" />
               <input {...register(`items.${index}.model`)} placeholder="Model no." className="p-2 border rounded text-sm" required />
+
+              {/* Rest of the fields like description, hsn, qty, price, gst, etc. */}
               <div className="relative w-full col-span-2 lg:col-span-2">
                 <input
                   {...register(`items.${index}.description`)}
@@ -294,6 +345,7 @@ const HanumanForm = () => {
                   required
                   onChange={(e) => handleDescriptionChange(index, e.target.value)}
                 />
+
                 {suggestions[index]?.length > 0 && (
                   <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
                     {suggestions[index].map((item, i) => (
@@ -312,27 +364,83 @@ const HanumanForm = () => {
               <input {...register(`items.${index}.quantity`)} type="number" placeholder="Qty" className="p-2 border rounded text-sm" required />
               <input {...register(`items.${index}.price`)} type="number" placeholder="Unit Price" className="p-2 border rounded text-sm" required />
               <input {...register(`items.${index}.gst`)} type="number" placeholder="GST %" className="p-2 border rounded text-sm" required />
+
               <button type="button" onClick={() => remove(index)} className="text-white bg-red-500 rounded-full px-4 py-1 text-sm hover:bg-red-600">
                 X
               </button>
+
+
+              {/* Checkbox for feature */}
+              <div className="col-span-full flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  {...register(`items.${index}.hasFeature`)}
+                  id={`feature-toggle-${index}`}
+                  className="h-4 w-4"
+                />
+                <label htmlFor={`feature-toggle-${index}`} className="text-sm">Add Feature Description</label>
+              </div>
+
+              {/* Conditionally show textarea if checkbox is checked */}
+              {watch(`items.${index}.hasFeature`) && (
+                <textarea
+                  {...register(`items.${index}.feature`)}
+                  placeholder="Feature details..."
+                  rows={4}
+                  className="col-span-full border p-2 rounded text-sm"
+                />
+              )}
             </div>
+
           ))}
-          <button type="button" onClick={addItem} className="bg-blue-600 text-white px-4 py-2 rounded text-sm mt-2 hover:bg-blue-700">
+          <button
+            type="button"
+            onClick={addItem}
+            className="bg-blue-600 text-white px-4 py-2 rounded text-sm mb-4 hover:bg-blue-700"
+          >
             Add Item
           </button>
         </div>
 
-        {/* Terms */}
-        <div>
-          <textarea {...register("terms")} rows={4} placeholder="Terms & Conditions" className="w-full border rounded p-2 text-sm" required />
+        {/* New: Terms & Conditions Checkboxes */}
+        {/* Terms Checkboxes */}
+        {/* Terms Checkboxes */}
+        <div className="space-y-2 mb-6">
+          <h3 className="font-semibold text-sm mb-2 md:text-md">Select Terms & Conditions</h3>
+
+          {termsList.map((term, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id={`term-${index}`}
+                className="h-3 w-3"
+                checked={checkedTerms.includes(term)} // 🌟 This makes them stay checked!
+                onChange={(e) => handleTermCheckboxChange(e.target.checked, term)}
+              />
+              <label htmlFor={`term-${index}`} className="text-xs md:text-sm">{term}</label>
+            </div>
+          ))}
         </div>
+
+
+        {/* Terms Textarea */}
+        <div>
+          <label className="block font-semibold text-sm mb-1 md:text-md">Terms & Conditions</label>
+          <textarea
+            {...register("terms")}
+            rows={8}
+            className="w-full border rounded p-2 text-sm"
+            placeholder="Type your additional Terms & Conditions here..."
+          />
+        </div>
+
 
         {/* Buttons */}
         <div className="flex flex-wrap gap-4 mt-6">
           <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
             {editData ? "View Quotation" : "Submit Quotation"}
           </button>
-          <button type="button" onClick={() => navigate(-1)} className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600">
+          <button type="button" onClick={() => navigate(-1)} className="bg-zinc-400 text-white px-6 py-2 rounded hover:bg-zinc-500">
             Back
           </button>
           <button type="button" onClick={() => navigate("/home/quotation")} className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">

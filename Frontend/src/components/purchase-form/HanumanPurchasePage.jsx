@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import logohanuman from "../images/logo_hanuman.png";
+import logohanuman from "../images/logo_hanuman.jpg";
 import "../side_link/Print.css";
 
 const HanumanPurchasePage = () => {

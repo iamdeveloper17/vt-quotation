@@ -143,7 +143,7 @@ const BRbioPage = () => {
           </tr>
 
           <tr>
-            <td colSpan={9} className="font-bold pb-4 text-sm md:text-md">Dear Sir/Mam</td>
+            <td colSpan={9} className="font-bold pb-4 text-sm md:text-md">Dear Sir/Madam,</td>
           </tr>
 
           <tr>

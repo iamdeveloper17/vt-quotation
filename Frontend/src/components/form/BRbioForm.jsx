@@ -294,7 +294,7 @@ const BRbioForm = () => {
   const handleTermCheckboxChange = (isChecked, termText) => {
     const currentTerms = watch("terms") || "";
     let updatedTerms = currentTerms;
-  
+
     if (isChecked) {
       if (!currentTerms.includes(termText)) {
         updatedTerms = currentTerms.trim() + (currentTerms ? "\n" : "") + `• ${termText}`;
@@ -305,10 +305,10 @@ const BRbioForm = () => {
       updatedTerms = currentTerms.replace(regex, "").trim();
       setCheckedTerms(prev => prev.filter(t => t !== termText));
     }
-  
+
     setValue("terms", updatedTerms);
   };
-  
+
 
   const [checkedTerms, setCheckedTerms] = useState([]);
 
@@ -323,12 +323,12 @@ const BRbioForm = () => {
     "INSTALLATION/DEMONSTRATION TRAINING: Shall be provided FOC at Users site by our Engineers.",
     "PERFORMANCE BANK GURANTEE: Will besubmitted after delivery and installation as per the terms of the tender.",
     "VALIDITY OF OFFER: (200 days) from the date of opening of tender."
-  ];  
+  ];
 
   useEffect(() => {
     if (editData && editData.items) {
       reset({ ...editData, items: editData.items });
-  
+
       // 🌟 New: update checkboxes state based on existing terms
       const existingTerms = editData.terms || "";
       const matchedTerms = termsList.filter(term => existingTerms.includes(term));
@@ -342,7 +342,7 @@ const BRbioForm = () => {
       fetchQuotationNumber();
     }
   }, [editData, reset, setValue]);
-  
+
 
 
   return (
@@ -509,23 +509,23 @@ const BRbioForm = () => {
 
         {/* New: Terms & Conditions Checkboxes */}
         {/* Terms Checkboxes */}
-{/* Terms Checkboxes */}
-<div className="space-y-2 mb-6">
-  <h3 className="font-semibold text-sm mb-2">Select Terms & Conditions</h3>
+        {/* Terms Checkboxes */}
+        <div className="space-y-2 mb-6">
+          <h3 className="font-semibold text-sm mb-2">Select Terms & Conditions</h3>
 
-  {termsList.map((term, index) => (
-    <div key={index} className="flex items-center gap-2">
-      <input
-        type="checkbox"
-        id={`term-${index}`}
-        className="h-4 w-4"
-        checked={checkedTerms.includes(term)} // 🌟 This makes them stay checked!
-        onChange={(e) => handleTermCheckboxChange(e.target.checked, term)}
-      />
-      <label htmlFor={`term-${index}`} className="text-sm">{term}</label>
-    </div>
-  ))}
-</div>
+          {termsList.map((term, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id={`term-${index}`}
+                className="h-4 w-4"
+                checked={checkedTerms.includes(term)} // 🌟 This makes them stay checked!
+                onChange={(e) => handleTermCheckboxChange(e.target.checked, term)}
+              />
+              <label htmlFor={`term-${index}`} className="text-sm">{term}</label>
+            </div>
+          ))}
+        </div>
 
 
         {/* Terms Textarea */}
