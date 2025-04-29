@@ -198,7 +198,7 @@ app.get("/invoices/last-number", async (req, res) => {
 
 app.post("/invoices", async (req, res) => {
   try {
-    const {
+    let {
       quotationNumber,
       date,
       validUntil,
@@ -219,23 +219,30 @@ app.post("/invoices", async (req, res) => {
       terms,
       footerNote,
       userEmail,
-      // ✅ Add these 4:
       purchaseNumber,
       orderAgainst,
       deliveryPeriod,
       placeInstallation
     } = req.body;
 
-    console.log("Received in backend:", {
-      purchaseNumber,
-      orderAgainst,
-      deliveryPeriod,
-      placeInstallation,
-    });
-
     if (!userEmail) {
       return res.status(400).json({ message: "User email is required" });
     }
+
+    // 🔥 Fix items: Force hasFeature and feature even if missing
+    items = items.map(item => ({
+      description: item.description,
+      hsn: item.hsn,
+      quantity: item.quantity,
+      unit: item.unit,
+      price: item.price,
+      gst: item.gst,
+      gstAmount: item.gstAmount,
+      totalAmount: item.totalAmount,
+      model: item.model,
+      hasFeature: item.hasFeature || false,
+      feature: item.feature || ""
+    }));
 
     let newQuotationNumber = quotationNumber;
 
@@ -244,11 +251,9 @@ app.post("/invoices", async (req, res) => {
       newQuotationNumber = counter;
     }
 
-    // ✅ Check if invoice with same quotation number exists
     const existing = await InvoiceModel.findOne({ quotationNumber });
 
     if (existing) {
-      // ✅ Update the existing invoice
       const updatedInvoice = await InvoiceModel.findOneAndUpdate(
         { quotationNumber },
         {
@@ -264,14 +269,13 @@ app.post("/invoices", async (req, res) => {
           clientContact,
           clientEmail,
           clientGSTIN,
-          items,
+          items, // ✅ Now corrected
           subTotal,
           totalGST,
           grandTotal,
           terms,
           footerNote,
           userEmail,
-          // ✅ Add these too:
           purchaseNumber,
           orderAgainst,
           deliveryPeriod,
@@ -283,7 +287,6 @@ app.post("/invoices", async (req, res) => {
       return res.status(200).json({ message: "Invoice updated successfully", quotationNumber });
     }
 
-    // ✅ Create new invoice if not found
     const newInvoice = new InvoiceModel({
       quotationNumber: newQuotationNumber,
       date,
@@ -298,14 +301,13 @@ app.post("/invoices", async (req, res) => {
       clientContact,
       clientEmail,
       clientGSTIN,
-      items,
+      items, // ✅ Fixed items here too
       subTotal,
       totalGST,
       grandTotal,
       terms,
       footerNote,
       userEmail,
-      // ✅ Add them here too:
       purchaseNumber,
       orderAgainst,
       deliveryPeriod,
