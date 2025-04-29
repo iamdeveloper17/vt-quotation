@@ -169,6 +169,12 @@ const BRbioPage = () => {
             </tr>
           ))}
 
+{/* {item.hasFeature && (
+  <div className="text-sm mt-1 italic text-gray-700">
+    <strong>Feature:</strong> {item.feature}
+  </div>
+)} */}
+
           <tr>
             <td colSpan={9}>
               <div className="my-6 text-sm space-y-1">

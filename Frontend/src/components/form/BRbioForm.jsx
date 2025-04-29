@@ -32,7 +32,9 @@ const BRbioForm = () => {
           gst: "",
           gstAmount: "",
           totalAmount: "",
-          model: ""
+          model: "",
+          hasFeature: false,
+          feature: ""
         },
       ],
       terms: "",
@@ -76,12 +78,18 @@ const BRbioForm = () => {
       const quantity = Number(item.quantity) || 0;
       const price = Number(item.price) || 0;
       const gst = Number(item.gst) || 0;
-
+    
       const gstAmount = (quantity * price * gst) / 100;
       const totalAmount = quantity * price + gstAmount;
-
-      return { ...item, gstAmount, totalAmount };
+    
+      // Keep all original fields like feature, hasFeature and add gstAmount and totalAmount
+      return {
+        ...item, // ✅ Spread everything including feature
+        gstAmount,
+        totalAmount,
+      };
     });
+    
 
     // ✅ Save unique suggestions for autocomplete
     const newSuggestions = calculatedItems.map(({ description, hsn, price, gst, model }) => ({
@@ -366,10 +374,54 @@ const BRbioForm = () => {
           <h3 className="text-lg font-semibold mb-2">Items</h3>
 
           {fields.map((item, index) => (
-            <div key={item.id} className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-4 mb-4 rounded-xl">
-              <input value={index + 1} readOnly className="p-2 border rounded text-sm bg-gray-100" />
-              <input {...register(`items.${index}.model`)} placeholder="Model no." className="p-2 border rounded text-sm" required />
-              <div className="relative w-full col-span-2 lg:col-span-2">
+            // <div key={item.id} className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-4 mb-4 rounded-xl">
+            //   <input value={index + 1} readOnly className="p-2 border rounded text-sm bg-gray-100" />
+            //   <input {...register(`items.${index}.model`)} placeholder="Model no." className="p-2 border rounded text-sm" required />
+              // <div className="relative w-full col-span-2 lg:col-span-2">
+              //   <input
+              //     {...register(`items.${index}.description`)}
+              //     placeholder="Description"
+              //     className="p-2 border rounded text-sm w-full"
+              //     required
+              //     onChange={(e) => handleDescriptionChange(index, e.target.value)}
+              //   />
+
+              //   {suggestions[index]?.length > 0 && (
+              //     <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
+              //       {suggestions[index].map((item, i) => (
+              //         <li
+              //           key={i}
+              //           className="p-2 cursor-pointer hover:bg-gray-100"
+              //           onClick={() => handleSelectSuggestion(index, item)}
+              //         >
+              //           {item.description} — {item.model}
+              //         </li>
+              //       ))}
+              //     </ul>
+              //   )}
+              // </div>
+
+            //   <input {...register(`items.${index}.hsn`)} placeholder="HSN" className="p-2 border rounded text-sm" />
+            //   <input {...register(`items.${index}.quantity`)} type="number" placeholder="Qty" className="p-2 border rounded text-sm" required />
+            //   <input {...register(`items.${index}.price`)} type="number" placeholder="Unit Price" className="p-2 border rounded text-sm" required />
+            //   <input {...register(`items.${index}.gst`)} type="number" placeholder="GST %" className="p-2 border rounded text-sm" required />
+            //   <button
+            //     type="button"
+            //     onClick={() => remove(index)}
+            //     className="text-white bg-red-500 rounded-full px-4 py-1 text-sm hover:bg-red-600"
+            //   >
+            //     X
+            //   </button>
+              
+            // </div>
+            <div key={item.id} className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-4 mb-4 rounded-xl">
+
+  {/* Existing inputs like index, model, description, etc. */}
+  <input value={index + 1} readOnly className="p-2 border rounded text-sm bg-gray-100" />
+  <input {...register(`items.${index}.model`)} placeholder="Model no." className="p-2 border rounded text-sm" required />
+
+  {/* Rest of the fields like description, hsn, qty, price, gst, etc. */}
+  <div className="relative w-full col-span-2 lg:col-span-2">
                 <input
                   {...register(`items.${index}.description`)}
                   placeholder="Description"
@@ -392,19 +444,38 @@ const BRbioForm = () => {
                   </ul>
                 )}
               </div>
+  <input {...register(`items.${index}.hsn`)} placeholder="HSN" className="p-2 border rounded text-sm" />
+  <input {...register(`items.${index}.quantity`)} type="number" placeholder="Qty" className="p-2 border rounded text-sm" required />
+  <input {...register(`items.${index}.price`)} type="number" placeholder="Unit Price" className="p-2 border rounded text-sm" required />
+  <input {...register(`items.${index}.gst`)} type="number" placeholder="GST %" className="p-2 border rounded text-sm" required />
 
-              <input {...register(`items.${index}.hsn`)} placeholder="HSN" className="p-2 border rounded text-sm" />
-              <input {...register(`items.${index}.quantity`)} type="number" placeholder="Qty" className="p-2 border rounded text-sm" required />
-              <input {...register(`items.${index}.price`)} type="number" placeholder="Unit Price" className="p-2 border rounded text-sm" required />
-              <input {...register(`items.${index}.gst`)} type="number" placeholder="GST %" className="p-2 border rounded text-sm" required />
-              <button
-                type="button"
-                onClick={() => remove(index)}
-                className="text-white bg-red-500 rounded-full px-4 py-1 text-sm hover:bg-red-600"
-              >
-                X
-              </button>
-            </div>
+  <button type="button" onClick={() => remove(index)} className="text-white bg-red-500 rounded-full px-4 py-1 text-sm hover:bg-red-600">
+    X
+  </button>
+
+  
+  {/* Checkbox for feature */}
+  <div className="col-span-full flex items-center gap-2">
+    <input
+      type="checkbox"
+      {...register(`items.${index}.hasFeature`)}
+      id={`feature-toggle-${index}`}
+      className="h-4 w-4"
+    />
+    <label htmlFor={`feature-toggle-${index}`} className="text-sm">Add Feature Description</label>
+  </div>
+
+  {/* Conditionally show textarea if checkbox is checked */}
+  {watch(`items.${index}.hasFeature`) && (
+    <textarea
+      {...register(`items.${index}.feature`)}
+      placeholder="Feature details..."
+      rows={2}
+      className="col-span-full border p-2 rounded text-sm"
+    />
+  )}
+</div>
+
           ))}
           <button
             type="button"
