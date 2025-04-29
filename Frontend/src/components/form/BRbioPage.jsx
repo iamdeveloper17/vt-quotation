@@ -151,7 +151,6 @@ const BRbioPage = () => {
             <th className="border border-gray-400 p-1 min-w-[60px]">GST (%)</th>
             <th className="border border-gray-400 p-1 min-w-[80px]">GST Amt</th>
             <th className="border border-gray-400 p-1 min-w-[80px]">Total</th>
-
           </tr>
 
           {formData.items.map((item, index) => (
