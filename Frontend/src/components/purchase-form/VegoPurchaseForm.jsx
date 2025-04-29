@@ -128,10 +128,10 @@ const VegoPurchaseForm = () => {
 
       // Map these correctly 👇
       SalesManagerName: data.clientName,
-      Address: data.clientAddress,
-      Contact: data.clientContact,
-      Email: data.clientEmail,
-      GSTIN: data.clientGSTIN,
+      Address: data.Address,
+      Contact: data.Contact,
+      Email: data.Email,
+      GSTIN: data.GSTIN,
 
       items: updatedItems,
       terms: data.terms,
