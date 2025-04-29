@@ -26,7 +26,7 @@ const app = express();
 app.use(express.json());
 
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://vt-quotation-ux.vercel.app/"],
+  origin: ["http://localhost:3000", "https://vt-quotation.onrender.com"],
   methods: "GET,POST,PUT,DELETE",
   credentials: true,
 };
