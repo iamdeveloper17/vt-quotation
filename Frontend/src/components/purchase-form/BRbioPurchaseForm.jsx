@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -7,6 +7,9 @@ const BRbioPurchaseForm = () => {
     const navigate = useNavigate();
     const editData = location.state?.editData;
     const [managerSuggestions, setManagerSuggestions] = useState([]);
+    const [isSalesManagerFocused, setIsSalesManagerFocused] = useState(false);
+const salesManagerWrapperRef = useRef(null);
+
 
     const { register, control, handleSubmit, setValue, watch, reset } = useForm({
         defaultValues: {
@@ -275,6 +278,20 @@ const BRbioPurchaseForm = () => {
         setManagerSuggestions([]);
       };      
 
+      useEffect(() => {
+        const handleClickOutside = (event) => {
+          if (salesManagerWrapperRef.current && !salesManagerWrapperRef.current.contains(event.target)) {
+            setIsSalesManagerFocused(false);
+            setManagerSuggestions([]);
+          }
+        };
+      
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+          document.removeEventListener("mousedown", handleClickOutside);
+        };
+      }, []);      
+
     return (
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center text-blue-500 uppercase">
@@ -293,7 +310,7 @@ const BRbioPurchaseForm = () => {
                         <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
                     </div>
                     <div className="space-y-3">
-                    <div className="relative">
+                    <div ref={salesManagerWrapperRef} className="relative w-full">
   <input
     {...register("SalesManagerName")}
     placeholder="Sales Manager Name"
@@ -303,9 +320,10 @@ const BRbioPurchaseForm = () => {
       setValue("SalesManagerName", e.target.value);
       handleSalesManagerNameChange(e.target.value);
     }}
+    onFocus={() => setIsSalesManagerFocused(true)}
   />
 
-  {managerSuggestions.length > 0 && (
+  {managerSuggestions.length > 0 && isSalesManagerFocused && (
     <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
       {managerSuggestions.map((manager, i) => (
         <li

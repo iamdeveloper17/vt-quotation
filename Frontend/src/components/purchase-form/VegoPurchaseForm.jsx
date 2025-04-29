@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -103,17 +103,17 @@ const VegoPurchaseForm = () => {
   const onSubmit = async (data) => {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) return alert("User not logged in. Please log in again.");
-  
+
     const updatedItems = data.items.map((item) => {
       const gstAmount = (item.quantity * item.price * item.gst) / 100;
       const totalAmount = item.quantity * item.price + gstAmount;
       return { ...item, gstAmount, totalAmount };
     });
-  
+
     const subTotal = updatedItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
     const totalGST = updatedItems.reduce((acc, item) => acc + item.gstAmount, 0);
     const grandTotal = subTotal + totalGST;
-  
+
     const updatedData = {
       purchaseNumber: data.purchaseNumber,
       date: data.date,
@@ -125,14 +125,14 @@ const VegoPurchaseForm = () => {
       companyContact: data.companyContact,
       companyEmail: data.companyEmail,
       companyGSTIN: data.companyGSTIN,
-  
+
       // Map these correctly 👇
       SalesManagerName: data.clientName,
       Address: data.clientAddress,
       Contact: data.clientContact,
       Email: data.clientEmail,
       GSTIN: data.clientGSTIN,
-  
+
       items: updatedItems,
       terms: data.terms,
       subTotal,
@@ -140,20 +140,20 @@ const VegoPurchaseForm = () => {
       grandTotal,
       userEmail,
     };
-  
+
     try {
       const url = editData?._id
         ? `https://vt-quotation.onrender.com/purchase-orders/${editData._id}`
         : "https://vt-quotation.onrender.com/purchase-orders";
-  
+
       const method = editData?._id ? "PUT" : "POST";
-  
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
       });
-  
+
       if (response.ok) {
         if (!editData) {
           for (const item of updatedItems) {
@@ -170,15 +170,15 @@ const VegoPurchaseForm = () => {
             });
           }
         }
-  
+
         const savedData = await response.json();
         alert(editData ? "Purchase Order updated!" : "Purchase Order saved!");
-  
+
         localStorage.setItem("lastInvoice", JSON.stringify({
           ...updatedData,
           _id: editData?._id || savedData.id
         }));
-  
+
         navigate("/vegopurchasepage");
       } else {
         alert("Something went wrong while saving.");
@@ -188,7 +188,7 @@ const VegoPurchaseForm = () => {
       alert("Error connecting to server");
     }
   };
-  
+
   const addItem = () => {
     append({
       description: "",
@@ -205,6 +205,11 @@ const VegoPurchaseForm = () => {
 
   const [savedItems, setSavedItems] = useState([]);
   const [suggestions, setSuggestions] = useState({});
+
+  const [managerSuggestions, setManagerSuggestions] = useState([]);
+  const [isSalesManagerFocused, setIsSalesManagerFocused] = useState(false);
+  const salesManagerWrapperRef = useRef(null);
+
 
   useEffect(() => {
     const storedItems = JSON.parse(localStorage.getItem("savedItems")) || [];
@@ -240,6 +245,44 @@ const VegoPurchaseForm = () => {
     setSuggestions((prev) => ({ ...prev, [index]: [] }));
   };
 
+  const handleSalesManagerNameChange = async (value) => {
+    if (!value) {
+      setManagerSuggestions([]);
+      return;
+    }
+    try {
+      const res = await fetch(`https://vt-quotation.onrender.com/salesmanagers/search?query=${value}`);
+      const data = await res.json();
+      setManagerSuggestions(data);
+    } catch (err) {
+      console.error("Error fetching sales managers:", err);
+    }
+  };
+
+  const handleSelectManager = (manager) => {
+    setValue("SalesManagerName", manager.name);
+    setValue("Address", manager.address);
+    setValue("Contact", manager.contact);
+    setValue("Email", manager.email);
+    setValue("GSTIN", manager.gstin);
+    setManagerSuggestions([]);
+    setIsSalesManagerFocused(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (salesManagerWrapperRef.current && !salesManagerWrapperRef.current.contains(event.target)) {
+        setIsSalesManagerFocused(false);
+        setManagerSuggestions([]);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center text-blue-500 uppercase">
@@ -258,11 +301,38 @@ const VegoPurchaseForm = () => {
             <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
           <div className="space-y-3">
-            <input {...register("clientName")} placeholder="Sales Manager Name" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientAddress")} placeholder="Address" required className="w-full p-2 border rounded text-sm" />
-            <input type="number" {...register("clientContact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
-            <input type="email" {...register("clientEmail")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientGSTIN")} placeholder="GSTIN" required className="w-full p-2 border rounded text-sm" />
+            <div ref={salesManagerWrapperRef} className="relative w-full">
+              <input
+                {...register("SalesManagerName")}
+                placeholder="Sales Manager Name"
+                required
+                className="w-full p-2 border rounded text-sm"
+                onChange={(e) => {
+                  setValue("clientName", e.target.value);
+                  handleSalesManagerNameChange(e.target.value);
+                }}
+                onFocus={() => setIsSalesManagerFocused(true)}
+              />
+
+              {managerSuggestions.length > 0 && isSalesManagerFocused && (
+                <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
+                  {managerSuggestions.map((manager, i) => (
+                    <li
+                      key={i}
+                      className="p-2 cursor-pointer hover:bg-gray-100"
+                      onClick={() => handleSelectManager(manager)}
+                    >
+                      {manager.name} — {manager.email}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <input {...register("Address")} placeholder="Address" required className="w-full p-2 border rounded text-sm" />
+            <input type="number" {...register("Contact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
+            <input type="email" {...register("Email")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
+            <input {...register("GSTIN")} placeholder="GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>
 

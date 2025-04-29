@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -6,6 +6,9 @@ const HHCorpPurchaseForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const editData = location.state?.editData;
+  const [managerSuggestions, setManagerSuggestions] = useState([]);
+  const [isSalesManagerFocused, setIsSalesManagerFocused] = useState(false);
+  const salesManagerWrapperRef = useRef(null);
 
   const { register, control, handleSubmit, setValue, watch, reset } = useForm({
     defaultValues: {
@@ -17,24 +20,12 @@ const HHCorpPurchaseForm = () => {
       quotationNumber: "",
       date: "",
       validUntil: "",
-      clientName: "",
-      clientAddress: "",
-      clientContact: "",
-      clientEmail: "",
-      clientGSTIN: "",
-      items: [
-        {
-          description: "",
-          hsn: "",
-          quantity: "",
-          unit: "PCS",
-          price: "",
-          gst: "",
-          gstAmount: "",
-          totalAmount: "",
-          model: ""
-        },
-      ],
+      SalesManagerName: "",
+      Address: "",
+      Contact: "",
+      Email: "",
+      GSTIN: "",
+      items: [{ description: "", hsn: "", quantity: "", unit: "PCS", price: "", gst: "", gstAmount: "", totalAmount: "", model: "" }],
       terms: "",
       purchaseNumber: "",
       orderAgainst: "",
@@ -97,17 +88,17 @@ const HHCorpPurchaseForm = () => {
   const onSubmit = async (data) => {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) return alert("User not logged in. Please log in again.");
-  
+
     const updatedItems = data.items.map((item) => {
       const gstAmount = (item.quantity * item.price * item.gst) / 100;
       const totalAmount = item.quantity * item.price + gstAmount;
       return { ...item, gstAmount, totalAmount };
     });
-  
+
     const subTotal = updatedItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
     const totalGST = updatedItems.reduce((acc, item) => acc + item.gstAmount, 0);
     const grandTotal = subTotal + totalGST;
-  
+
     const updatedData = {
       purchaseNumber: data.purchaseNumber,
       date: data.date,
@@ -119,14 +110,13 @@ const HHCorpPurchaseForm = () => {
       companyContact: data.companyContact,
       companyEmail: data.companyEmail,
       companyGSTIN: data.companyGSTIN,
-  
-      // Correctly mapped
-      SalesManagerName: data.clientName,
-      Address: data.clientAddress,
-      Contact: data.clientContact,
-      Email: data.clientEmail,
-      GSTIN: data.clientGSTIN,
-  
+
+      SalesManagerName: data.SalesManagerName,
+      Address: data.Address,
+      Contact: data.Contact,
+      Email: data.Email,
+      GSTIN: data.GSTIN,
+
       items: updatedItems,
       terms: data.terms,
       subTotal,
@@ -134,20 +124,20 @@ const HHCorpPurchaseForm = () => {
       grandTotal,
       userEmail,
     };
-  
+
     try {
       const url = editData?._id
         ? `https://vt-quotation.onrender.com/purchase-orders/${editData._id}`
         : "https://vt-quotation.onrender.com/purchase-orders";
-  
+
       const method = editData?._id ? "PUT" : "POST";
-  
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
       });
-  
+
       if (response.ok) {
         if (!editData) {
           for (const item of updatedItems) {
@@ -163,16 +153,29 @@ const HHCorpPurchaseForm = () => {
               }),
             });
           }
+
+          // Save Sales Manager
+          await fetch("https://vt-quotation.onrender.com/salesmanagers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: data.SalesManagerName,
+              address: data.Address,
+              contact: data.Contact,
+              email: data.Email,
+              gstin: data.GSTIN,
+            }),
+          });
         }
-  
+
         const savedData = await response.json();
         alert(editData ? "Purchase Order updated!" : "Purchase Order saved!");
-  
+
         localStorage.setItem("lastInvoice", JSON.stringify({
           ...updatedData,
           _id: editData?._id || savedData.id
         }));
-  
+
         navigate("/hhpurchasepage");
       } else {
         alert("Something went wrong while saving.");
@@ -181,41 +184,17 @@ const HHCorpPurchaseForm = () => {
       console.error("Submission error:", err);
       alert("Error connecting to server");
     }
-  };  
-
-  
-  const addItem = () => {
-    append({
-      description: "",
-      hsn: "",
-      quantity: "",
-      unit: "PCS",
-      price: "",
-      gst: "",
-      gstAmount: "",
-      totalAmount: "",
-    });
   };
 
+  const addItem = () => {
+    append({ description: "", hsn: "", quantity: "", unit: "PCS", price: "", gst: "", gstAmount: "", totalAmount: "", model: "" });
+  };
 
-  const [savedItems, setSavedItems] = useState([]);
   const [suggestions, setSuggestions] = useState({});
-
-  useEffect(() => {
-    const storedItems = JSON.parse(localStorage.getItem("savedItems")) || [];
-    setSavedItems(storedItems);
-  }, []);
-
-  useEffect(() => {
-    register("purchaseNumber");
-    register("orderAgainst");
-    register("deliveryPeriod");
-    register("placeInstallation");
-  }, [register]);
 
   const handleDescriptionChange = async (index, value) => {
     if (!value) return setSuggestions((prev) => ({ ...prev, [index]: [] }));
-  
+
     try {
       const res = await fetch(`https://vt-quotation.onrender.com/items/search?query=${value}`);
       const data = await res.json();
@@ -224,17 +203,49 @@ const HHCorpPurchaseForm = () => {
       console.error("❌ Error fetching suggestions:", err);
     }
   };
-  
 
   const handleSelectSuggestion = (index, item) => {
     setValue(`items.${index}.description`, item.description);
-    setValue(`items.${index}.model`, item.model); // ✅ Add this line
+    setValue(`items.${index}.model`, item.model);
     setValue(`items.${index}.hsn`, item.hsn);
     setValue(`items.${index}.price`, item.price);
     setValue(`items.${index}.gst`, item.gst);
     setSuggestions((prev) => ({ ...prev, [index]: [] }));
   };
 
+  const handleSalesManagerNameChange = async (value) => {
+    if (!value) {
+      setManagerSuggestions([]);
+      return;
+    }
+    try {
+      const res = await fetch(`https://vt-quotation.onrender.com/salesmanagers/search?query=${value}`);
+      const data = await res.json();
+      setManagerSuggestions(data);
+    } catch (err) {
+      console.error("Error fetching sales managers:", err);
+    }
+  };
+
+  const handleSelectManager = (manager) => {
+    setValue("SalesManagerName", manager.name);
+    setValue("Address", manager.address);
+    setValue("Contact", manager.contact);
+    setValue("Email", manager.email);
+    setValue("GSTIN", manager.gstin);
+    setManagerSuggestions([]);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (salesManagerWrapperRef.current && !salesManagerWrapperRef.current.contains(event.target)) {
+        setIsSalesManagerFocused(false);
+        setManagerSuggestions([]);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
@@ -244,7 +255,7 @@ const HHCorpPurchaseForm = () => {
 
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
-        {/* Company & Client Info */}
+        {/* Company & Sales Manager Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-3">
             <input {...register("companyName")} placeholder="Company Name" required className="w-full p-2 border rounded text-sm" />
@@ -253,12 +264,39 @@ const HHCorpPurchaseForm = () => {
             <input type="email" {...register("companyEmail")} placeholder="Company Email" required className="w-full p-2 border rounded text-sm" />
             <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
+
           <div className="space-y-3">
-            <input {...register("clientName")} placeholder="Sales Manager Name" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientAddress")} placeholder="Address" required className="w-full p-2 border rounded text-sm" />
-            <input type="number" {...register("clientContact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
-            <input type="email" {...register("clientEmail")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("clientGSTIN")} placeholder="GSTIN" required className="w-full p-2 border rounded text-sm" />
+            <div ref={salesManagerWrapperRef} className="relative w-full">
+              <input
+                {...register("SalesManagerName")}
+                placeholder="Sales Manager Name"
+                required
+                className="w-full p-2 border rounded text-sm"
+                onChange={(e) => {
+                  setValue("SalesManagerName", e.target.value);
+                  handleSalesManagerNameChange(e.target.value);
+                }}
+                onFocus={() => setIsSalesManagerFocused(true)}
+              />
+              {managerSuggestions.length > 0 && isSalesManagerFocused && (
+                <ul className="absolute z-10 bg-white border border-gray-300 rounded-md mt-1 w-full max-h-40 overflow-y-auto">
+                  {managerSuggestions.map((manager, i) => (
+                    <li
+                      key={i}
+                      className="p-2 cursor-pointer hover:bg-gray-100"
+                      onClick={() => handleSelectManager(manager)}
+                    >
+                      {manager.name} — {manager.email}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <input {...register("Address")} placeholder="Address" required className="w-full p-2 border rounded text-sm" />
+            <input type="number" {...register("Contact")} placeholder="Contact" required className="w-full p-2 border rounded text-sm" />
+            <input type="email" {...register("Email")} placeholder="Email" required className="w-full p-2 border rounded text-sm" />
+            <input {...register("GSTIN")} placeholder="GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>
 
@@ -268,10 +306,6 @@ const HHCorpPurchaseForm = () => {
             <label className="block font-semibold text-sm mb-1">Date</label>
             <input {...register("date")} type="date" required className="w-full p-2 border rounded text-sm" />
           </div>
-          {/* <div>
-            <label className="block font-semibold text-sm mb-1">Valid Until</label>
-            <input {...register("validUntil")} type="date" required className="w-full p-2 border rounded text-sm" />
-          </div> */}
           <div>
             <label className="block font-semibold text-sm mb-1">Purchase Order No.</label>
             <input {...register("purchaseNumber")} type="number" required className="w-full p-2 border rounded text-sm" />
