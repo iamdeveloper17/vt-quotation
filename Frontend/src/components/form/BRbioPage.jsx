@@ -60,10 +60,10 @@ const BRbioPage = () => {
   const handleCleanPrint = () => {
     const customTitle = `Quotation-${formData.quotationNumber}`;
     const content = document.getElementById("invoice").innerHTML;
-  
+
     const printWindow = window.open("", "_blank", "width=800,height=600");
     if (!printWindow) return alert("Popup blocked. Please allow popups for this site.");
-  
+
     printWindow.document.open();
     printWindow.document.write(`
       <html>
@@ -89,7 +89,7 @@ const BRbioPage = () => {
     `);
     printWindow.document.close();
   };
-  
+
   return (
     <div className="w-full max-w-[210mm] min-h-screen md:min-h-[297mm] bg-white mx-auto my-4" id="invoice">
       <table className="w-full table-auto border-collapse print:table">
@@ -157,8 +157,18 @@ const BRbioPage = () => {
             <tr key={index} className="text-center text-xs md:text-sm align-top">
               <td className="border border-gray-400 p-1">{index + 1}</td>
               <td className="border border-gray-400 p-1">{item.model}</td>
-              {/* <td className="border border-gray-400 p-1 text-left break-words whitespace-pre-wrap">{item.description}</td> */}
-              <td className="border border-gray-400 px-2 py-1 text-left break-words max-w-[230px]">{item.description}</td>
+              <td className="border border-gray-400 px-2 py-1 text-left break-words max-w-[230px] whitespace-pre-wrap">
+                <div className="text-sm leading-snug">
+                  {item.description}
+                  {item.hasFeature && item.feature && (
+                    <div className="mt-2 text-xs text-gray-800">
+                      <strong className="block mb-1">Features:</strong>
+                      <span className="whitespace-pre-wrap">{item.feature}</span>
+                    </div>
+                  )}
+                </div>
+              </td>
+
               <td className="border border-gray-400 p-1">{item.hsn}</td>
               <td className="border border-gray-400 p-1">{item.quantity}</td>
               <td className="border border-gray-400 p-1">₹{item.price}</td>
@@ -167,12 +177,6 @@ const BRbioPage = () => {
               <td className="border border-gray-400 p-1">₹{(item.quantity * item.price + (item.quantity * item.price * item.gst) / 100).toFixed(2)}</td>
             </tr>
           ))}
-
-{/* {item.hasFeature && (
-  <div className="text-sm mt-1 italic text-gray-700">
-    <strong>Feature:</strong> {item.feature}
-  </div>
-)} */}
 
           <tr>
             <td colSpan={9}>
