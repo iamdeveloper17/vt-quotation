@@ -290,6 +290,25 @@ const BRbioForm = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // 🛠️ Add or Remove Terms
+  const handleTermCheckboxChange = (isChecked, termText) => {
+    const currentTerms = watch("terms") || "";
+    let updatedTerms = currentTerms;
+
+    if (isChecked) {
+      if (!currentTerms.includes(termText)) {
+        updatedTerms = currentTerms.trim() + (currentTerms ? "\n" : "") + `• ${termText}`;
+      }
+    } else {
+      // Remove term if unchecked
+      const regex = new RegExp(`• ${termText}\\n?`, "g");
+      updatedTerms = currentTerms.replace(regex, "").trim();
+    }
+
+    setValue("terms", updatedTerms);
+  };
+
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center text-blue-500 uppercase">
@@ -347,7 +366,7 @@ const BRbioForm = () => {
         </div>
 
         {/* Date & Quotation */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block font-semibold text-sm mb-1">Date</label>
             <input {...register("date")} type="date" required className="w-full p-2 border rounded text-sm" />
@@ -366,6 +385,9 @@ const BRbioForm = () => {
               className="w-full p-2 border rounded text-sm"
             />
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
           <div>
             <label className="block font-semibold text-sm mb-1">Subject</label>
             <input {...register("subject")} type="text" required className="w-full p-2 border rounded text-sm" />
@@ -449,16 +471,46 @@ const BRbioForm = () => {
           </button>
         </div>
 
-        {/* Terms */}
+        {/* New: Terms & Conditions Checkboxes */}
+        {/* Terms Checkboxes */}
+        <div className="space-y-2 mb-6">
+          <h3 className="font-semibold text-sm mb-2">Select Terms & Conditions</h3>
+
+          {[
+            "Goods once sold will not be taken back.",
+            "Warranty as per manufacturer policy.",
+            "Payment must be made within 30 days.",
+            "Prices are subject to change without notice.",
+            "Delivery period mentioned is tentative.",
+            "Installation charges are extra.",
+            "Transport and insurance at buyer's risk.",
+            "Order once placed cannot be cancelled.",
+            "Taxes will be extra as applicable.",
+            "Goods dispatched after full payment received."
+          ].map((term, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id={`term-${index}`}
+                className="h-4 w-4"
+                onChange={(e) => handleTermCheckboxChange(e.target.checked, term)}
+              />
+              <label htmlFor={`term-${index}`} className="text-sm">{term}</label>
+            </div>
+          ))}
+        </div>
+
+        {/* Terms Textarea */}
         <div>
-          <label className="block font-semibold text-sm mb-1">Term & Conditions</label>
+          <label className="block font-semibold text-sm mb-1">Terms & Conditions</label>
           <textarea
             {...register("terms")}
-            rows={4}
+            rows={8}
             className="w-full border rounded p-2 text-sm"
-            required
+            placeholder="Type your additional Terms & Conditions here..."
           />
         </div>
+
 
         {/* Buttons */}
         <div className="flex flex-wrap gap-4 mt-6">
