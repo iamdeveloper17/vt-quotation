@@ -141,6 +141,14 @@ const BRbioPage = () => {
             </td>
           </tr>
 
+          <tr>
+            <td colSpan={9} className="font-bold pb-4 text-sm md:text-md">Dear Sir/Mam</td>
+          </tr>
+
+          <tr>
+            <td colSpan={9} className="pb-4 text-sm md:text-md"><span className="font-bold">Subject:</span> {formData.subject}</td>
+          </tr>
+
           <tr className="text-xs md:text-sm bg-gray-100">
             <th className="border border-gray-400 p-1 min-w-[50px]">S No.</th>
             <th className="border border-gray-400 p-1 min-w-[80px] max-w-[100px]">Model No.</th>

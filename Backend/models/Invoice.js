@@ -14,6 +14,7 @@ const InvoiceSchema = new mongoose.Schema({
   clientGSTIN: String,
   date: String,
   validUntil: String,
+  subject: String,
   items: [
     {
       description: String,

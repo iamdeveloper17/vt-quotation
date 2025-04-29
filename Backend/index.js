@@ -223,6 +223,7 @@ app.post("/invoices", async (req, res) => {
       clientContact,
       clientEmail,
       clientGSTIN,
+      subject,
       items,
       subTotal,
       totalGST,
@@ -280,6 +281,7 @@ app.post("/invoices", async (req, res) => {
           clientContact,
           clientEmail,
           clientGSTIN,
+          subject,
           items, // ✅ Now corrected
           subTotal,
           totalGST,
@@ -312,6 +314,7 @@ app.post("/invoices", async (req, res) => {
       clientContact,
       clientEmail,
       clientGSTIN,
+      subject,
       items, // ✅ Fixed items here too
       subTotal,
       totalGST,

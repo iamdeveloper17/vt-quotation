@@ -22,6 +22,7 @@ const BRbioForm = () => {
       clientContact: "",
       clientEmail: "",
       clientGSTIN: "",
+      subject: "",
       items: [
         {
           description: "",
@@ -346,7 +347,7 @@ const BRbioForm = () => {
         </div>
 
         {/* Date & Quotation */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
             <label className="block font-semibold text-sm mb-1">Date</label>
             <input {...register("date")} type="date" required className="w-full p-2 border rounded text-sm" />
@@ -364,6 +365,10 @@ const BRbioForm = () => {
               readOnly
               className="w-full p-2 border rounded text-sm"
             />
+          </div>
+          <div>
+            <label className="block font-semibold text-sm mb-1">Subject</label>
+            <input {...register("subject")} type="text" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>
 
