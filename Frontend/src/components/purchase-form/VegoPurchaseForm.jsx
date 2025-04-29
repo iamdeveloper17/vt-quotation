@@ -169,7 +169,20 @@ const VegoPurchaseForm = () => {
               }),
             });
           }
-        }
+        
+          // ✅ Save Sales Manager info
+          await fetch("https://vt-quotation.onrender.com/salesmanagers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: data.SalesManagerName,
+              address: data.Address,
+              contact: data.Contact,
+              email: data.Email,
+              gstin: data.GSTIN,
+            }),
+          });
+        }        
 
         const savedData = await response.json();
         alert(editData ? "Purchase Order updated!" : "Purchase Order saved!");
