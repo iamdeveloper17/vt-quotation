@@ -294,19 +294,55 @@ const BRbioForm = () => {
   const handleTermCheckboxChange = (isChecked, termText) => {
     const currentTerms = watch("terms") || "";
     let updatedTerms = currentTerms;
-
+  
     if (isChecked) {
       if (!currentTerms.includes(termText)) {
         updatedTerms = currentTerms.trim() + (currentTerms ? "\n" : "") + `• ${termText}`;
       }
+      setCheckedTerms(prev => [...prev, termText]);
     } else {
-      // Remove term if unchecked
       const regex = new RegExp(`• ${termText}\\n?`, "g");
       updatedTerms = currentTerms.replace(regex, "").trim();
+      setCheckedTerms(prev => prev.filter(t => t !== termText));
     }
-
+  
     setValue("terms", updatedTerms);
   };
+  
+
+  const [checkedTerms, setCheckedTerms] = useState([]);
+
+  const termsList = [
+    "PRICES: The prices are expressed in F.O.R Hospital basis in (INR)",
+    "GST & ANY OTHER LOCAL TAX: GST @ 12% shall be chargeable",
+    "PAYMENT: As per your terms & conditions.",
+    "Country OF ORIGIN: Singapore.",
+    "DELIVERY PERIOD: As per your terms & conditions",
+    "WARRANTY: Comprehensive Warranty for 3 Years as per tender terms & conditions",
+    "AMC/CMC AFTER WARRANTEE: AMC/CMC charge for next 7 years after expiry of warranty period of 3 years are mentioned in Price Schedule - Annexure - 2",
+    "INSTALLATION/DEMONSTRATION TRAINING: Shall be provided FOC at Users site by our Engineers.",
+    "PERFORMANCE BANK GURANTEE: Will besubmitted after delivery and installation as per the terms of the tender.",
+    "VALIDITY OF OFFER: (200 days) from the date of opening of tender."
+  ];  
+
+  useEffect(() => {
+    if (editData && editData.items) {
+      reset({ ...editData, items: editData.items });
+  
+      // 🌟 New: update checkboxes state based on existing terms
+      const existingTerms = editData.terms || "";
+      const matchedTerms = termsList.filter(term => existingTerms.includes(term));
+      setCheckedTerms(matchedTerms);
+    } else {
+      setValue("date", new Date().toISOString().split("T")[0]);
+      setValue(
+        "terms",
+        "Best Terms and Conditions of a company serve as a legal agreement between the business and its customers, clients, or users..."
+      );
+      fetchQuotationNumber();
+    }
+  }, [editData, reset, setValue]);
+  
 
 
   return (
@@ -473,32 +509,24 @@ const BRbioForm = () => {
 
         {/* New: Terms & Conditions Checkboxes */}
         {/* Terms Checkboxes */}
-        <div className="space-y-2 mb-6">
-          <h3 className="font-semibold text-sm mb-2">Select Terms & Conditions</h3>
+{/* Terms Checkboxes */}
+<div className="space-y-2 mb-6">
+  <h3 className="font-semibold text-sm mb-2">Select Terms & Conditions</h3>
 
-          {[
-            "Goods once sold will not be taken back.",
-            "Warranty as per manufacturer policy.",
-            "Payment must be made within 30 days.",
-            "Prices are subject to change without notice.",
-            "Delivery period mentioned is tentative.",
-            "Installation charges are extra.",
-            "Transport and insurance at buyer's risk.",
-            "Order once placed cannot be cancelled.",
-            "Taxes will be extra as applicable.",
-            "Goods dispatched after full payment received."
-          ].map((term, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id={`term-${index}`}
-                className="h-4 w-4"
-                onChange={(e) => handleTermCheckboxChange(e.target.checked, term)}
-              />
-              <label htmlFor={`term-${index}`} className="text-sm">{term}</label>
-            </div>
-          ))}
-        </div>
+  {termsList.map((term, index) => (
+    <div key={index} className="flex items-center gap-2">
+      <input
+        type="checkbox"
+        id={`term-${index}`}
+        className="h-4 w-4"
+        checked={checkedTerms.includes(term)} // 🌟 This makes them stay checked!
+        onChange={(e) => handleTermCheckboxChange(e.target.checked, term)}
+      />
+      <label htmlFor={`term-${index}`} className="text-sm">{term}</label>
+    </div>
+  ))}
+</div>
+
 
         {/* Terms Textarea */}
         <div>

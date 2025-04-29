@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import logobr from "../images/logo_br.png";
+import logobr from "../images/logo_br.jpg";
 import "../side_link/Print.css";
 
 const BRbioPurchasePage = () => {

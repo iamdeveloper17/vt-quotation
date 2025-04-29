@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import logobr from "../images/logo_br.png";
+import logobr from "../images/logo_br.jpg";
+import br_stamp from "../images/br_stamp.png";
 import "../side_link/Print.css";
 
 const BRbioPage = () => {
@@ -96,7 +97,7 @@ const BRbioPage = () => {
         <thead className="print:table-header-group">
           <tr>
             <td colSpan={9} className="print:border-none">
-              <div className="flex flex-col sm:flex-row items-center justify-between mt-8 mb-4 border-b-2 pb-4 border-black">
+              <div className="flex flex-col sm:flex-row items-center justify-between mt-8 mb-4 pb-4">
                 <img src={logobr} alt="Company Logo" className="w-full" />
               </div>
             </td>
@@ -106,11 +107,11 @@ const BRbioPage = () => {
         <tbody className="print:table-row-group print:pb-4">
           <tr>
             <td colSpan={9}>
-              <h1 className="text-lg md:text-2xl font-bold text-blue-500 uppercase mt-8 mb-6 text-center">
+              <h1 className="text-lg md:text-2xl font-bold text-blue-500 uppercase mt-8 mb-6">
                 Quotation {formData.quotationNumber}
               </h1>
-              <p className="text-xs text-right md:text-sm"><span className="font-bold">Date:</span> {formData.date}</p>
-              <p className="text-xs text-right md:text-sm"><span className="font-bold">Valid:</span> {formData.validUntil}</p>
+              <p className="text-xs md:text-sm"><span className="font-bold">Date:</span> {formData.date}</p>
+              <p className="text-xs md:text-sm"><span className="font-bold">Valid:</span> {formData.validUntil}</p>
             </td>
           </tr>
 
@@ -127,7 +128,7 @@ const BRbioPage = () => {
                     <p><strong>GSTIN:</strong> {formData.companyGSTIN}</p>
                   </div>
                 </div>
-                <div className="items-end text-right">
+                <div className="items-end">
                   <h3 className="text-blue-500 font-bold mb-2 text-sm md:text-base">Bill To</h3>
                   <div className="text-xs md:text-sm">
                     <p className="font-bold">{formData.clientName}</p>
@@ -206,9 +207,21 @@ const BRbioPage = () => {
                 {formData.terms.split('\n').map((line, i) => (
                   <p key={i} className="text-xs md:text-sm whitespace-pre-line">{line}</p>
                 ))}
+                <p className="text-xs md:text-sm mt-4 font-bold">We hereby accept all tender terms & conditions as mentioned in tender documents.</p>
               </div>
             </td>
           </tr>
+
+          <tr>
+          <td colSpan={9}>
+          <div className="mt-10">
+                <p className="text-sm">Yours Sincerely,</p>
+                <p className="text-sm font-bold">For {formData.companyName}</p>
+                <img src={br_stamp} alt="" className="w-40" />
+                <p className="text-sm">Authorised Signatory</p>
+              </div>
+            </td>
+            </tr>
         </tbody>
       </table>
 
