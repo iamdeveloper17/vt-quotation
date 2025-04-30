@@ -29,21 +29,14 @@ const Signup = () => {
     defaultValues: userToEdit || {},
   });
 
-  // useEffect(() => {
-  //   if (userToEdit) {
-  //     reset(userToEdit);
-  //   }
-  // }, [userToEdit, reset]);
   useEffect(() => {
     if (userToEdit) {
-      // const editableUser = { ...userToEdit, password: "" }; // ⛔ don't preload hashed password
-      // reset(editableUser);
       const { password, ...rest } = userToEdit;
-reset(rest); // exclude password from being filled in the form
-
+      reset(rest); // preload form with existing user data (without password)
+    } else {
+      reset({ name: "", email: "", password: "", role: "" }); // ⛔ reset for new user
     }
-  }, [userToEdit, reset]);
-  
+  }, [userToEdit, reset]);  
 
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState("");
