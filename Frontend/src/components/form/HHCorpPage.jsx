@@ -204,7 +204,7 @@ const HHCorpPage = () => {
               <div className="mb-6">
                 <h2 className="text-sm md:text-base font-bold mb-1">Terms & Conditions</h2>
                 {formData.terms.split('\n').map((line, i) => (
-                  <p key={i} className="text-xs md:text-sm whitespace-pre-line">{line}</p>
+                  <p key={i} className="text-xs whitespace-pre-line">{line}</p>
                 ))}
                 <p className="text-xs md:text-sm mt-4 font-bold">We hereby accept all tender terms & conditions as mentioned in tender documents.</p>
               </div>
