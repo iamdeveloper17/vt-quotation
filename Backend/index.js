@@ -123,14 +123,70 @@ app.post("/register", async (req, res) => {
   }
 });
 
+// app.post("/login", async (req, res) => {
+//   const { email, password } = req.body;
+
+//   try {
+
+//     if (email === "admin@secret.com" && password === "cipher123") {
+//       const token = jwt.sign({ userId: "admin-static-id", role: "admin" }, JWT_SECRET, { expiresIn: "2h" });
+    
+//       return res.status(200).json({
+//         message: "Admin login successful",
+//         token,
+//         user: {
+//           name: "Admin User",
+//           email,
+//           role: "admin",
+//           canCreateQuotation: true,
+//           canCreatePurchaseOrder: true
+//         },
+//       });
+//     }
+    
+//     console.log("Received login request:", email, password);
+    
+
+//     // ✅ Then: Handle regular users from MongoDB
+//     const user = await EmployeeModel.findOne({ email });
+//     if (!user || user.password !== password) {
+//       return res.status(400).json({ message: "Invalid credentials" });
+//     }
+
+//     const token = jwt.sign(
+//       { userId: user._id, role: user.role },
+//       JWT_SECRET,
+//       { expiresIn: "2h" }
+//     );
+
+//     res.status(200).json({
+//       message: "Login successful",
+//       token,
+//       user: {
+//         name: user.name,
+//         email: user.email,
+//         role: user.role,
+//         canCreateQuotation: user.canCreateQuotation || false,
+//         canCreatePurchaseOrder: user.canCreatePurchaseOrder || false
+//       }
+//     });
+    
+
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error", error: error.message });
+//   }
+// });
+
+const bcrypt = require("bcrypt");
+
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-
+    // ✅ Static admin check (keep as is)
     if (email === "admin@secret.com" && password === "cipher123") {
       const token = jwt.sign({ userId: "admin-static-id", role: "admin" }, JWT_SECRET, { expiresIn: "2h" });
-    
+
       return res.status(200).json({
         message: "Admin login successful",
         token,
@@ -143,16 +199,20 @@ app.post("/login", async (req, res) => {
         },
       });
     }
-    
-    console.log("Received login request:", email, password);
-    
 
-    // ✅ Then: Handle regular users from MongoDB
+    // ✅ Find user from DB
     const user = await EmployeeModel.findOne({ email });
-    if (!user || user.password !== password) {
+    if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // ✅ Compare password using bcrypt (asynchronous and secure)
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // ✅ Generate JWT token
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       JWT_SECRET,
@@ -170,9 +230,9 @@ app.post("/login", async (req, res) => {
         canCreatePurchaseOrder: user.canCreatePurchaseOrder || false
       }
     });
-    
 
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
