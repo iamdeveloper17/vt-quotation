@@ -518,11 +518,11 @@ const BRbioForm = () => {
               <input
                 type="checkbox"
                 id={`term-${index}`}
-                className="h-4 w-4"
+                className="h-3 w-3"
                 checked={checkedTerms.includes(term)} // 🌟 This makes them stay checked!
                 onChange={(e) => handleTermCheckboxChange(e.target.checked, term)}
               />
-              <label htmlFor={`term-${index}`} className="text-sm">{term}</label>
+              <label htmlFor={`term-${index}`} className="text-xs">{term}</label>
             </div>
           ))}
         </div>

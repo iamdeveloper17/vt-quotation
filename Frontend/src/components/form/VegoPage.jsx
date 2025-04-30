@@ -90,15 +90,13 @@ const VegoPage = () => {
     printWindow.document.close();
   };
 
-  const rows = Array.from({ length: 4 });
-
   return (
-    <div className="w-full max-w-[210mm] min-h-screen sm:min-h-[297mm] bg-white mx-auto overflow-auto my-4" id="invoice">
-      <table className="w-full print:table border-collapse">
+    <div className="w-full max-w-[210mm] min-h-screen md:min-h-[297mm] bg-white mx-auto my-4" id="invoice">
+      <table className="w-full table-auto border-collapse print:table">
         <thead className="print:table-header-group">
           <tr>
             <td colSpan={9} className="print:border-none">
-              <div className="flex items-center justify-between mt-8 mb-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between mt-8 mb-4 pb-4">
                 <img src={logovego} alt="Company Logo" className="w-full" />
               </div>
             </td>
@@ -108,13 +106,14 @@ const VegoPage = () => {
         <tbody className="print:table-row-group print:pb-4">
           <tr>
             <td colSpan={9}>
-              <div>
-                <h1 className="font-bold text-blue-500 uppercase text-center text-lg md:text-2xl mt-8 mb-6">quotation {formData.quotationNumber}</h1>
-                <p className="text-xs text-right md:text-sm"><span className="font-bold">Date:</span> {formData.date}</p>
-                <p className="text-xs text-right md:text-sm"><span className="font-bold">Valid:</span> {formData.validUntil}</p>
-              </div>
+              <h1 className="text-lg md:text-2xl font-bold text-blue-500 uppercase mt-8 mb-6">
+                Quotation {formData.quotationNumber}
+              </h1>
+              <p className="text-xs md:text-sm"><span className="font-bold">Date:</span> {formData.date}</p>
+              <p className="text-xs md:text-sm"><span className="font-bold">Valid:</span> {formData.validUntil}</p>
             </td>
           </tr>
+
           <tr>
             <td colSpan={9}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 mt-12">
@@ -122,42 +121,62 @@ const VegoPage = () => {
                   <h3 className="text-blue-500 font-bold mb-2 text-sm md:text-base">Company Details</h3>
                   <div className="text-xs md:text-sm">
                     <p className="font-bold">{formData.companyName}</p>
-                    <p><span className="font-bold">Address :</span> {formData.companyAddress}</p>
-                    <p><span className="font-bold">Contact no. :</span> {formData.companyContact}</p>
-                    <p><span className="font-bold">Email :</span> {formData.companyEmail}</p>
-                    <p><span className="font-bold">GSTIN :</span> {formData.companyGSTIN}</p>
+                    <p><strong>Address:</strong> {formData.companyAddress}</p>
+                    <p><strong>Contact:</strong> {formData.companyContact}</p>
+                    <p><strong>Email:</strong> {formData.companyEmail}</p>
+                    <p><strong>GSTIN:</strong> {formData.companyGSTIN}</p>
                   </div>
                 </div>
-                <div className="items-end text-right">
+                <div className="items-end">
                   <h3 className="text-blue-500 font-bold mb-2 text-sm md:text-base">Bill To</h3>
                   <div className="text-xs md:text-sm">
                     <p className="font-bold">{formData.clientName}</p>
-                    <p><span className="font-bold">Address :</span> {formData.clientAddress}</p>
-                    <p><span className="font-bold">Contact no. :</span> {formData.clientContact}</p>
-                    <p><span className="font-bold">Email :</span> {formData.clientEmail}</p>
-                    <p><span className="font-bold">GSTIN :</span> {formData.clientGSTIN}</p>
+                    <p><strong>Address:</strong> {formData.clientAddress}</p>
+                    <p><strong>Contact:</strong> {formData.clientContact}</p>
+                    <p><strong>Email:</strong> {formData.clientEmail}</p>
+                    <p><strong>GSTIN:</strong> {formData.clientGSTIN}</p>
                   </div>
                 </div>
               </div>
             </td>
           </tr>
 
-          <tr className="text-xs md:text-sm">
-            <th className="border border-gray-400 p-1 sm:p-2">S No.</th>
-            <th className="border border-gray-400 p-1 sm:p-2">Model No.</th>
-            <th className="border border-gray-400 p-1 sm:p-2 text-left">Description</th>
-            <th className="border border-gray-400 p-1 sm:p-2">HSN</th>
-            <th className="border border-gray-400 p-1 sm:p-2">Qty</th>
-            <th className="border border-gray-400 p-1 sm:p-2">Unit Price</th>
-            <th className="border border-gray-400 p-1 sm:p-2">GST (%)</th>
-            <th className="border border-gray-400 p-1 sm:p-2">GST Amt</th>
-            <th className="border border-gray-400 p-1 sm:p-2">Total</th>
+          <tr>
+            <td colSpan={9} className="font-bold pb-4 text-sm md:text-md">Dear Sir/Madam,</td>
           </tr>
+
+          <tr>
+            <td colSpan={9} className="pb-4 text-sm md:text-md"><span className="font-bold">Subject:</span> {formData.subject}</td>
+          </tr>
+
+          <tr className="text-xs md:text-sm bg-gray-100">
+            <th className="border border-gray-400 p-1 min-w-[50px]">S No.</th>
+            <th className="border border-gray-400 p-1 min-w-[80px] max-w-[100px]">Model No.</th>
+            <th className="border border-gray-400 px-2 py-1 min-w-[180px] max-w-[230px] text-left break-words">Description</th>
+            <th className="border border-gray-400 p-1 min-w-[70px]">HSN</th>
+            <th className="border border-gray-400 p-1 min-w-[40px]">Qty</th>
+            <th className="border border-gray-400 p-1 min-w-[80px]">Unit Price</th>
+            <th className="border border-gray-400 p-1 min-w-[60px]">GST (%)</th>
+            <th className="border border-gray-400 p-1 min-w-[80px]">GST Amt</th>
+            <th className="border border-gray-400 p-1 min-w-[80px]">Total</th>
+          </tr>
+
           {formData.items.map((item, index) => (
-            <tr key={index} className="text-center text-xs md:text-sm">
+            <tr key={index} className="text-center text-xs md:text-sm align-top">
               <td className="border border-gray-400 p-1">{index + 1}</td>
               <td className="border border-gray-400 p-1">{item.model}</td>
-              <td className="border border-gray-400 py-1 px-2 text-left">{item.description}</td>
+              <td className="border border-gray-400 px-2 py-1 text-left break-words max-w-[230px] whitespace-pre-wrap">
+                <div className="text-sm leading-snug">
+                  {item.description}
+                  {item.hasFeature && item.feature && (
+                    <div className="mt-2 text-xs text-gray-800">
+                      <strong className="block mb-1">Features:</strong>
+                      <span className="whitespace-pre-wrap">{item.feature}</span>
+                    </div>
+                  )}
+                </div>
+              </td>
+
               <td className="border border-gray-400 p-1">{item.hsn}</td>
               <td className="border border-gray-400 p-1">{item.quantity}</td>
               <td className="border border-gray-400 p-1">₹{item.price}</td>
@@ -169,10 +188,12 @@ const VegoPage = () => {
 
           <tr>
             <td colSpan={9}>
-              <div className="mb-6 text-sm mt-6">
+              <div className="my-6 text-sm space-y-1">
                 <p><strong>Subtotal:</strong> ₹{subtotal.toFixed(2)}</p>
                 <p><strong>Total GST:</strong> ₹{totalGST.toFixed(2)}</p>
-                <p className="text-green-700 font-semibold text-base"><strong>Grand Total:</strong> ₹{grandTotal.toFixed(2)}</p>
+                <p className="text-green-700 font-semibold text-base">
+                  <strong>Grand Total:</strong> ₹{grandTotal.toFixed(2)}
+                </p>
                 <p className="text-xs md:text-sm"><strong>In Words:</strong> {numberToIndianWords(grandTotal)}</p>
               </div>
             </td>
@@ -181,22 +202,45 @@ const VegoPage = () => {
           <tr>
             <td colSpan={9}>
               <div className="mb-6">
-                <h2 className="text-sm sm:text-base font-bold mb-1">Terms & Conditions</h2>
-                {formData.terms.split('\n').map((part, i) => (
-                  <p className="text-xs md:text-sm whitespace-pre-line" key={i}>{part}</p>
+                <h2 className="text-sm md:text-base font-bold mb-1">Terms & Conditions</h2>
+                {formData.terms.split('\n').map((line, i) => (
+                  <p key={i} className="text-xs md:text-sm whitespace-pre-line">{line}</p>
                 ))}
+                <p className="text-xs md:text-sm mt-4 font-bold">We hereby accept all tender terms & conditions as mentioned in tender documents.</p>
               </div>
             </td>
           </tr>
+
+          <tr>
+          <td colSpan={9}>
+          <div className="mt-10">
+                <p className="text-sm">Yours Sincerely,</p>
+                <p className="text-sm font-bold">For {formData.companyName}</p>
+                {/* <img src={hanuman_stamp} alt="" className="w-40" /> */}
+                <p className="text-sm">Authorised Signatory</p>
+              </div>
+            </td>
+            </tr>
         </tbody>
       </table>
 
-      <div className="flex flex-col sm:flex-row gap-4 mt-4 no-print">
-        <button onClick={handleCleanPrint} className="bg-green-500 text-white px-4 py-2 rounded">Print Quotation</button>
-        <button onClick={() => navigate("/quotation/vego", { state: { editData: formData } })} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      <div className="flex flex-col sm:flex-row gap-3 mt-4 no-print">
+        <button onClick={handleCleanPrint} className="bg-green-500 text-white px-4 py-2 rounded w-full sm:w-auto">
+          Print Quotation
+        </button>
+        <button
+          onClick={() => navigate("/quotation/br", { state: { editData: formData } })}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full sm:w-auto"
+        >
           Edit Quotation
         </button>
-        <button onClick={() => { localStorage.removeItem("lastInvoice"); navigate("/home/quotation"); }} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+        <button
+          onClick={() => {
+            localStorage.removeItem("lastInvoice");
+            navigate("/home/quotation");
+          }}
+          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 w-full sm:w-auto"
+        >
           Done
         </button>
       </div>

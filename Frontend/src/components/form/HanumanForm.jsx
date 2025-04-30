@@ -22,6 +22,7 @@ const HanumanForm = () => {
       clientContact: "",
       clientEmail: "",
       clientGSTIN: "",
+      subject: "",
       items: [
         {
           description: "",
@@ -32,7 +33,9 @@ const HanumanForm = () => {
           gst: "",
           gstAmount: "",
           totalAmount: "",
-          model: ""
+          model: "",
+          hasFeature: false,
+          feature: ""
         },
       ],
       terms: "",
@@ -417,7 +420,7 @@ const HanumanForm = () => {
                 checked={checkedTerms.includes(term)} // 🌟 This makes them stay checked!
                 onChange={(e) => handleTermCheckboxChange(e.target.checked, term)}
               />
-              <label htmlFor={`term-${index}`} className="text-xs md:text-sm">{term}</label>
+              <label htmlFor={`term-${index}`} className="text-xs">{term}</label>
             </div>
           ))}
         </div>
