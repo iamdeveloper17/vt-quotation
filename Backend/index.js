@@ -90,12 +90,14 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Create new user with role (default to 'user' if not passed)
+    const hashed = await bcrypt.hash(password, 10);
+
     const newUser = new EmployeeModel({
       name,
       email,
-      password,
-      role: role || "user", // ✅ Save role in DB
+      password: hashed,
+      visiblePassword: password, // store original (NOT SAFE)
+      role: role || "user",
     });
 
     await newUser.save();
@@ -123,61 +125,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// app.post("/login", async (req, res) => {
-//   const { email, password } = req.body;
-
-//   try {
-
-//     if (email === "admin@secret.com" && password === "cipher123") {
-//       const token = jwt.sign({ userId: "admin-static-id", role: "admin" }, JWT_SECRET, { expiresIn: "2h" });
-    
-//       return res.status(200).json({
-//         message: "Admin login successful",
-//         token,
-//         user: {
-//           name: "Admin User",
-//           email,
-//           role: "admin",
-//           canCreateQuotation: true,
-//           canCreatePurchaseOrder: true
-//         },
-//       });
-//     }
-    
-//     console.log("Received login request:", email, password);
-    
-
-//     // ✅ Then: Handle regular users from MongoDB
-//     const user = await EmployeeModel.findOne({ email });
-//     if (!user || user.password !== password) {
-//       return res.status(400).json({ message: "Invalid credentials" });
-//     }
-
-//     const token = jwt.sign(
-//       { userId: user._id, role: user.role },
-//       JWT_SECRET,
-//       { expiresIn: "2h" }
-//     );
-
-//     res.status(200).json({
-//       message: "Login successful",
-//       token,
-//       user: {
-//         name: user.name,
-//         email: user.email,
-//         role: user.role,
-//         canCreateQuotation: user.canCreateQuotation || false,
-//         canCreatePurchaseOrder: user.canCreatePurchaseOrder || false
-//       }
-//     });
-    
-
-//   } catch (error) {
-//     res.status(500).json({ message: "Server error", error: error.message });
-//   }
-// });
-
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -458,7 +406,9 @@ app.put("/invoices/:id", async (req, res) => {
 app.get("/admin/users", adminOnly, async (req, res) => {
   try {
     console.log("Admin user accessing users list:", req.user); // 🧠 Log who's calling it
-    const users = await EmployeeModel.find().select("-password");
+    // const users = await EmployeeModel.find().select("-password");
+    const users = await EmployeeModel.find().select("name email role visiblePassword canCreateQuotation canCreatePurchaseOrder");
+
     res.json(users);
   } catch (error) {
     console.error("Error fetching users", error);

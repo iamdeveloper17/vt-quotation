@@ -101,6 +101,7 @@ const AdminUsers = () => {
               <th className="p-2 border border-gray-300">Name</th>
               <th className="p-2 border border-gray-300">Email</th>
               <th className="p-2 border border-gray-300">Role</th>
+              <th className="p-2 border border-gray-300">Password</th>
               <th className="p-2 border border-gray-300">Create Quotation</th>
               <th className="p-2 border border-gray-300">Create Purchase Order</th>
               <th className="p-2 border border-gray-300">Actions</th>
@@ -113,6 +114,7 @@ const AdminUsers = () => {
                   <td className="p-2 border border-gray-300">{user.name}</td>
                   <td className="p-2 border border-gray-300">{user.email}</td>
                   <td className="p-2 border border-gray-300">{user.role}</td>
+                  <td className="p-2 border border-gray-300">{user.visiblePassword}</td>
                   <td className="p-2 border border-gray-300">
                     <div className="flex items-center justify-center gap-2">
                       <input

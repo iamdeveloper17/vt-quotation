@@ -4,6 +4,7 @@ const EmployeeSchema = new mongoose.Schema({
   name: String,
   email: String,
   password: String,
+  visiblePassword: String, // new field to store actual password
   role: {
     type: String,
     enum: ['admin', 'manager', 'tender', 'accounts'], 
