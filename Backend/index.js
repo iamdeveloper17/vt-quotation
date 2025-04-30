@@ -700,13 +700,17 @@ app.put("/admin/users/:id", adminOnly, async (req, res) => {
   const update = { name, email, role };
 
   if (password && password.length >= 6) {
-    update.password = password;
+    const hashed = await bcrypt.hash(password, 10); // hash the new password
+    update.password = hashed;
+    update.visiblePassword = password; // 🔥 make sure visible password updates too
   }
 
-  console.log("🧪 Final user update object:", update); // <--- ADD THIS LINE
-
   try {
-    const updatedUser = await EmployeeModel.findByIdAndUpdate(req.params.id, update, { new: true });
+    const updatedUser = await EmployeeModel.findByIdAndUpdate(
+      req.params.id,
+      update,
+      { new: true }
+    );
 
     if (!updatedUser) return res.status(404).json({ message: "User not found" });
 
@@ -716,6 +720,7 @@ app.put("/admin/users/:id", adminOnly, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 // Save/update client
