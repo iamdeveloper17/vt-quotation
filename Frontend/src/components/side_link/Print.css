@@ -1,52 +1,47 @@
-/* @media print {
-  body {
-    background-color: white !important;
-  }
-} */
-
 @media print {
   @page {
     size: A4;
-    margin: 20mm;
-  }
-
-  .print\\:table {
-    display: table !important;
-    width: 100%;
-  }
-
-  .print\\:table-header-group {
-    display: table-header-group !important;
-  }
-
-  .print\\:table-row-group {
-    display: table-row-group !important;
+    margin: 20mm 15mm 20mm 15mm;
   }
 
   body {
-    -webkit-print-color-adjust: exact;
+    margin: 0;
+    padding: 0;
     print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
-  .print\\:hidden {
-    display: none !important;
+  .print\\:table-header-group {
+    display: table-header-group;
   }
 
-  .no-print {
-    display: none !important;
-    visibility: hidden !important;
+  .print\\:table-footer-group {
+    display: table-footer-group;
   }
 
-  table {
-    table-layout: fixed;
-    width: 100%;
+  /* Style logo row */
+  .logo-cell {
+    padding-bottom: 8px;
   }
-  
-  td, th {
-    word-wrap: break-word;
-    vertical-align: top;
+
+  /* TOP LINE */
+  .print-only-header td {
+    border-top: 1px solid black;
+    height: 1px;
+    padding: 0;
   }
-  
+
+  /* BOTTOM LINE */
+  .print-only-footer td {
+    border-bottom: 1px solid black;
+    height: 1px;
+    padding: 0;
+  }
+
+  /* HIDE top border on first page */
+  thead:first-of-type .print-only-header td {
+    border-top: none !important;
+  }
+
+  /* Hide bottom line on last page — workaround: move signature section outside table */
 }
-
-

@@ -309,7 +309,6 @@ const BRbioForm = () => {
     setValue("terms", updatedTerms);
   };
 
-
   const [checkedTerms, setCheckedTerms] = useState([]);
 
   const termsList = [
@@ -343,8 +342,6 @@ const BRbioForm = () => {
     }
   }, [editData, reset, setValue]);
 
-
-
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 bg-white shadow-md rounded-md">
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center text-blue-500 uppercase">
@@ -354,14 +351,7 @@ const BRbioForm = () => {
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
         {/* Company & Client Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-3">
-            <input {...register("companyName")} placeholder="Company Name" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("companyAddress")} placeholder="Company Address" required className="w-full p-2 border rounded text-sm" />
-            <input type="number" {...register("companyContact")} placeholder="Company Contact" required className="w-full p-2 border rounded text-sm" />
-            <input type="email" {...register("companyEmail")} placeholder="Company Email" required className="w-full p-2 border rounded text-sm" />
-            <input {...register("companyGSTIN")} placeholder="Company GSTIN" required className="w-full p-2 border rounded text-sm" />
-          </div>
+        <div className="grid grid-cols-1 gap-6">
           <div className="space-y-3 relative w-full">
             <div ref={clientNameWrapperRef} className="relative w-full">
               <input
@@ -388,7 +378,19 @@ const BRbioForm = () => {
             </div>
 
             <input {...register("clientAddress")} placeholder="Client Address" required className="w-full p-2 border rounded text-sm" />
-            <input type="number" {...register("clientContact")} placeholder="Client Contact" required className="w-full p-2 border rounded text-sm" />
+            {/* <input type="number" {...register("clientContact")} placeholder="Client Contact" className="w-full p-2 border rounded text-sm" /> */}
+            <input
+  type="text"
+  {...register("clientContact", {
+    pattern: {
+      value: /^(\d{0,15}|N\/A)?$/,
+      message: "Enter digits or 'N/A'",
+    },
+  })}
+  placeholder="Client Contact"
+  className="w-full p-2 border rounded text-sm"
+/>
+
             <input
               type="email"
               {...register("clientEmail")}
@@ -396,8 +398,6 @@ const BRbioForm = () => {
               required
               className="w-full p-2 border rounded text-sm"
             />
-
-            <input {...register("clientGSTIN")} placeholder="Client GSTIN" required className="w-full p-2 border rounded text-sm" />
           </div>
         </div>
 
@@ -442,7 +442,7 @@ const BRbioForm = () => {
               <input {...register(`items.${index}.model`)} placeholder="Model no." className="p-2 border rounded text-sm" required />
 
               {/* Rest of the fields like description, hsn, qty, price, gst, etc. */}
-              <div className="relative w-full col-span-2 lg:col-span-2">
+              <div className="relative w-full col-span-2 lg:col-span-3">
                 <input
                   {...register(`items.${index}.description`)}
                   placeholder="Description"
@@ -465,7 +465,6 @@ const BRbioForm = () => {
                   </ul>
                 )}
               </div>
-              <input {...register(`items.${index}.hsn`)} placeholder="HSN" className="p-2 border rounded text-sm" />
               <input {...register(`items.${index}.quantity`)} type="number" placeholder="Qty" className="p-2 border rounded text-sm" required />
               <input {...register(`items.${index}.price`)} type="number" placeholder="Unit Price" className="p-2 border rounded text-sm" required />
               <input {...register(`items.${index}.gst`)} type="number" placeholder="GST %" className="p-2 border rounded text-sm" required />
